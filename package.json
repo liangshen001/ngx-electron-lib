@@ -1,13 +1,29 @@
 {
   "name": "ngx-electron",
-  "version": "0.0.0",
+  "version": "8.7.0",
+  "main": "dist/electron/main.js",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --port 4200",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "ngx-electron:server-start": "ngx-electron server-start . --hmr",
+    "ngx-electron:local-start": "ngx-electron local-start .",
+    "ngx-electron:build:win": "ngx-electron build . -w --configuration production",
+    "ngx-electron:build:mac": "ngx-electron build . -m --configuration production",
+    "ngx-electron:build:linux": "ngx-electron build . -l --configuration production",
+    "npm:scope:ngx-electron": "npm config set scope ngx-electron",
+    "build:@ngx-electron": "npm run build:@ngx-electron/core && npm run build:@ngx-electron/data && build:@ngx-electron/main && build:@ngx-electron/cli",
+    "build:@ngx-electron/core": "ng build @ngx-electron/core",
+    "build:@ngx-electron/store": "ng build @ngx-electron/store",
+    "build:@ngx-electron/main": "tsc -p ./projects/ngx-electron/main && npm link ./projects/ngx-electron/main",
+    "build:@ngx-electron/cli": "tsc -p ./projects/ngx-electron/cli && npm link ./projects/ngx-electron/cli",
+    "publish:@ngx-electron/main": "npm run build:@ngx-electron/main && npm run npm:scope:ngx-electron && npm publish --access public projects/ngx-electron/main",
+    "publish:@ngx-electron/core": "npm run build:@ngx-electron/core && npm run npm:scope:ngx-electron && npm publish --access public dist/ngx-electron/core",
+    "publish:@ngx-electron/store": "npm run build:@ngx-electron/store && npm run npm:scope:ngx-electron && npm publish --access public dist/ngx-electron/store",
+    "publish:@ngx-electron/cli": "npm run build:@ngx-electron/cli && npm run npm:scope:ngx-electron && npm publish --access public projects/ngx-electron/cli"
   },
   "private": true,
   "dependencies": {
@@ -19,12 +35,19 @@
     "@angular/platform-browser": "~8.2.14",
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
+    "@ngrx/effects": "^8.6.0",
+    "@ngrx/entity": "^8.6.0",
+    "@ngrx/store": "^8.6.0",
+    "electron": "^7.1.7",
+    "electron-reload": "^1.5.0",
+    "electron-updater": "^4.2.0",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.803.21",
+    "@angular-devkit/build-ng-packagr": "~0.803.21",
     "@angular/cli": "~8.3.21",
     "@angular/compiler-cli": "~8.2.14",
     "@angular/language-service": "~8.2.14",
@@ -39,8 +62,10 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
+    "ng-packagr": "^5.4.0",
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
+    "tsickle": "^0.37.0",
     "tslint": "~5.15.0",
     "typescript": "~3.5.3"
   }

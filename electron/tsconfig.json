@@ -1,0 +1,12 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../dist/electron",
+      "target": "es2015",
+      "module": "commonjs",
+      "moduleResolution": "node"
+    },
+    "files": [
+        "./main.ts"
+    ]
+}

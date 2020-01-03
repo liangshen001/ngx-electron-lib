@@ -124,6 +124,76 @@
           }
         }
       }
+    },
+    "@ngx-electron/core": {
+      "projectType": "library",
+      "root": "projects/ngx-electron/core",
+      "sourceRoot": "projects/ngx-electron/core/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ngx-electron/core/tsconfig.lib.json",
+            "project": "projects/ngx-electron/core/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-electron/core/src/test.ts",
+            "tsConfig": "projects/ngx-electron/core/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-electron/core/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-electron/core/tsconfig.lib.json",
+              "projects/ngx-electron/core/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "@ngx-electron/store": {
+      "projectType": "library",
+      "root": "projects/ngx-electron/store",
+      "sourceRoot": "projects/ngx-electron/store/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ngx-electron/store/tsconfig.lib.json",
+            "project": "projects/ngx-electron/store/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-electron/store/src/test.ts",
+            "tsConfig": "projects/ngx-electron/store/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-electron/store/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-electron/store/tsconfig.lib.json",
+              "projects/ngx-electron/store/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }},
   "defaultProject": "ngx-electron"
 }

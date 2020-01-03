@@ -1,0 +1,16 @@
+{
+  "alias": "n",
+  "usage": "<project>",
+  "desc": "创建一个angular, electron应用",
+  "$impl": "./new",
+  "options": [
+    {
+      "flags": "-s, --store",
+      "desc": "加入依赖@ngx-electron/data(引入ngrx相关的模块)"
+    },
+    {
+      "flags": "--skip-install",
+      "desc": "跳过npm install"
+    }
+  ]
+}

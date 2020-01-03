@@ -1,0 +1,9 @@
+{
+  "name": "@ngx-electron/store",
+  "version": "8.7.0",
+  "peerDependencies": {
+    "@angular/common": "^8.2.14",
+    "@angular/core": "^8.2.14",
+    "@ngx-electron/core": "^8.7.0"
+  }
+}

@@ -1,0 +1,30 @@
+<div [class.window-border]="isElectron" [class.mac-window-border]="isMac" class="full">
+    <div [class.window-container]="isElectron" class="full position-relative">
+        <div class="full background-full" [style.background]="backgroundSafeStyle" [ngStyle]="style">
+            <ng-content></ng-content>
+        </div>
+        <div class="window-control" *ngIf="isElectron">
+            <!--<span class="title">-->
+                <!--<ng-template [ngTemplateOutlet]="titleTemp"></ng-template>-->
+            <!--</span>-->
+            <div class="sys-control-box">
+                <button class="sys-btn-close"
+                        [title]="closeBtnTitle"
+                        (click)="close()"
+                        *ngIf="showCloseBtn"
+                ></button>
+                <button class="sys-btn-mini"
+                        [title]="miniBtnTitle"
+                        (click)="minimize()"
+                        *ngIf="showMiniBtn"
+                ></button>
+                <button class="sys-btn-set"
+                        [title]="settingBtnTitle"
+                        (click)="setting.emit()"
+                        *ngIf="showSettingBtn"
+                ></button>
+                <ng-template [ngTemplateOutlet]="btnTemp"></ng-template>
+            </div>
+        </div>
+    </div>
+</div>
