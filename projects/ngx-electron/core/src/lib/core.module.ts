@@ -4,12 +4,14 @@ import {NgxElectronContentMenuDirective} from './directives/ngx-electron-content
 import {NgxElectronWindowComponent} from './components/ngx-electron-window/ngx-electron-window.component';
 import {NgxElectronCoreModule} from '../public-api';
 import {NgxElectronService} from './services/ngx-electron.service';
+import {NgxElectronDragDirective} from './directives/ngx-electron-drag.directive';
 
 
 
 @NgModule({
   declarations: [
     NgxElectronContentMenuDirective,
+    NgxElectronDragDirective,
     NgxElectronWindowComponent
   ],
   imports: [
@@ -17,6 +19,7 @@ import {NgxElectronService} from './services/ngx-electron.service';
   ],
   exports: [
     NgxElectronContentMenuDirective,
+    NgxElectronDragDirective,
     NgxElectronWindowComponent
   ]
 })
