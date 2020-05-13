@@ -4,7 +4,7 @@ import {User} from '../../../../models/user';
 import {select, Store} from '@ngrx/store';
 import {AddUser, DeleteUser, UpdateUser} from '../../../../actions/user.action';
 import {getAllUsers, UserReducerState} from '../../../../reducers/user.reducer';
-import {NgxElectronDataService} from '@ngx-electron/data';
+import {NgxElectronStoreService} from '@ngx-electron/store';
 
 @Component({
     selector: 'app-user-table',
@@ -17,7 +17,7 @@ export class UserTableComponent implements OnInit {
     sort: number;
 
     constructor(private store$: Store<UserReducerState>,
-                private electronDataService: NgxElectronDataService) {
+                private electronStoreService: NgxElectronStoreService) {
     }
 
     ngOnInit(): void {
@@ -35,18 +35,18 @@ export class UserTableComponent implements OnInit {
     }
 
     update(id: number) {
-        this.electronDataService.dispatch(new UpdateUser(this.updateMap.get(id)));
+        this.electronStoreService.dispatch(new UpdateUser(this.updateMap.get(id)));
         this.cancelUpdate(id);
     }
 
     addUser() {
-        this.electronDataService.dispatch(new AddUser({
+        this.electronStoreService.dispatch(new AddUser({
             name: this.name,
             sort: +this.sort
         }))
     }
 
     deleteUser(id: number) {
-        this.electronDataService.dispatch(new DeleteUser(id));
+        this.electronStoreService.dispatch(new DeleteUser(id));
     }
 }

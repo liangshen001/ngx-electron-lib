@@ -21,7 +21,8 @@ function createWindow(routerUrl: string, options: BrowserWindowConstructorOption
         transparent: true,
         show: false,
         webPreferences: {
-          nodeIntegration: true
+          nodeIntegration: true,
+          webSecurity: false
         },
         ...options
     });

@@ -77,6 +77,7 @@ export class NgxElectronService {
         this.isLoadElectronMain = !!this.remote.ipcMain.listenerCount('ngx-electron-load-electron-main');
         this.ipcRenderer.on('ngx-electron-core-init-data', (event, initData) => this.initData = initData);
     }
+
     /**
      * 判断是否加载了@ngx-electron/electron-main模块
      */
@@ -88,17 +89,18 @@ export class NgxElectronService {
         let win = new this.remote.BrowserWindow({
             ...this.defaultWinOptions,
             webPreferences: {
-              nodeIntegration: true
+                nodeIntegration: true,
+                webSecurity: false
             },
             ...options
         });
-        const url = this.isServer() ? `http://${ location.hostname }:${ location.port }/#${ routerUrl }` :
-            `${ window['require']('url').format({
+        const url = this.isServer() ? `http://${location.hostname}:${location.port}/#${routerUrl}` :
+            `${window['require']('url').format({
                 pathname: window['require']('path').join(this.remote.app.getAppPath(),
                     'dist', this.remote.app.getName(), 'index.html'),
                 protocol: 'file:',
                 slashes: true
-            }) }#${ routerUrl }`;
+            })}#${routerUrl}`;
         console.log(`加载url:${url}`);
         win.loadURL(url);
         if (this.isOpenDevTools()) {
@@ -113,6 +115,14 @@ export class NgxElectronService {
         }
         win.once('ready-to-show', () => win.show());
         return win;
+    }
+
+    sendDataByWindowKeys(data: any, ...keys: string[]) {
+        this.send(data, ...keys);
+    }
+
+    sendDataByWindowIds(data: any, ...ids: number[]) {
+        this.send(data, ...ids);
     }
 
     send(data: any, ...ids: number[]);
@@ -131,9 +141,11 @@ export class NgxElectronService {
                                 return this.isLoadElectronMain && this.getWinIdByKey(idKey);
                             case 'number':
                                 return idKey;
-                            default: return null;
+                            default:
+                                return null;
                         }
                     })
+                    .filter(id => !!id)
                     .map(id => this.remote.BrowserWindow.fromId(id))
                     .filter(win => !!win)
                     .forEach(win => win.webContents.send('ngx-electron-core-data', data));
@@ -165,7 +177,8 @@ export class NgxElectronService {
         key = routerUrl,
         initData,
         webHandler = () => this.router.navigateByUrl(routerUrl),
-        created = () => {},
+        created = () => {
+        },
         parent
     }: {
         key?: string,
@@ -223,8 +236,8 @@ export class NgxElectronService {
     }
 
 
-
     /**
+     *
      * 获得此key的窗口 若key值的窗口不存在则返回 null
      * 在调用之前要确保主进程初始化了@ngx-electron/electron-main模块 否则不要调用此方法
      * @param key key
@@ -261,6 +274,7 @@ export class NgxElectronService {
     isLinux() {
         return this.isElectron() && this.ipcRenderer.sendSync('ngx-electron-is-linux');
     }
+
     /**
      * 设置tray菜单
      * @param template 1
@@ -270,7 +284,7 @@ export class NgxElectronService {
         this.ipcRenderer.on(`ngx-electron-click-tray-context-menu-item-${timestamp}`, (event, i) => {
             const item = template.find((value, index) => index === i);
             this.ngZone.run(() => setTimeout(() =>
-                    item.click && item.click(null, null, null)));
+                item.click && item.click(null, null, null)));
         });
         // template.forEach(
         //     (currentValue, index) => this.ipcRenderer.on(`ngx-electron-click-tray-context-menu-item-${index}-${timestamp}`,
@@ -280,6 +294,7 @@ export class NgxElectronService {
         //         }))));
         this.ipcRenderer.send('ngx-electron-set-tray-context-menu', template, timestamp);
     }
+
     /**
      * 检测更新
      */

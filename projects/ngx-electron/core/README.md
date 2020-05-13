@@ -12,7 +12,7 @@ electron 7.x
 
 相关项目
 * @ngx-electron/main
-* @ngx-electron/data
+* @ngx-electron/store
 * @ngx-electron/cli
 
 完整例子请看 @ngx-electron/cli 并使用ngx-electron来创建 并代替electron来启动应用

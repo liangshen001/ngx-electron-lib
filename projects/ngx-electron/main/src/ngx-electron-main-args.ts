@@ -6,7 +6,7 @@ let port;
 let openDevTools;
 
 function getArgValue(args: string[], name: string): string | boolean {
-    let argNameIndex = args.indexOf(name);
+    const argNameIndex = args.indexOf(name);
     if (argNameIndex) {
         const argValueIndex = argNameIndex + 1;
         if (args.length > argValueIndex) {

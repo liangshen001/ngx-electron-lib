@@ -4,7 +4,7 @@ import {NgModule} from '@angular/core';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {NgxElectronCoreModule} from '@ngx-electron/core';
-import {NgxElectronStoreModule} from '@ngx-electron/sotre';
+import {NgxElectronStoreModule} from '@ngx-electron/store';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
 import {metaReducers, reducers} from './reducers';

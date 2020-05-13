@@ -1,6 +1,6 @@
 {
   "name": "@ngx-electron/main",
-  "version": "8.7.0",
+  "version": "8.7.3",
   "main": "index.js",
   "author": {
     "name": "liangshen001",
@@ -17,8 +17,8 @@
   },
   "peerDependencies": {
     "electron": "^7.1.7",
-    "electron-reload": "^1.5.0",
-    "electron-updater": "^4.2.0"
+    "electron-reload": "1.5.0",
+    "electron-updater": "4.2.0"
   },
   "keywords": [
     "angular",
