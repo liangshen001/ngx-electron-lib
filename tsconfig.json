@@ -42,6 +42,12 @@
       ],
       "@ngx-electron/store/*": [
         "dist/ngx-electron/store/*"
+      ],
+      "@ngx-electron/build": [
+        "dist/ngx-electron/build"
+      ],
+      "@ngx-electron/build/*": [
+        "dist/ngx-electron/build/*"
       ]
     }
   },
