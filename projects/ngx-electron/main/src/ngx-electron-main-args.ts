@@ -24,7 +24,7 @@ function initArgs() {
     isServer = args.includes('--server')
     if (isServer) {
         console.log('加载服务的方式运行');
-        port = getArgValue(args, '--port') || 4200;
+        port = getArgValue(args, '--port') || 8080;
         host = getArgValue(args, '--host') || 'localhost';
         console.log(`host:${host}`);
         console.log(`port:${port}`);

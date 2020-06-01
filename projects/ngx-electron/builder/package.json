@@ -4,7 +4,8 @@
     "main": "command/index.js",
     "peerDependencies": {
         "@angular/common": "^8.2.14",
-        "@angular/core": "^8.2.14"
+        "@angular/core": "^8.2.14",
+        "electron-builder": "22.7.0"
     },
     "builders": "builders.json"
 }

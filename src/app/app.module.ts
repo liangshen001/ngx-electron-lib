@@ -22,8 +22,8 @@ import {NgxElectronStoreModule} from '../../projects/ngx-electron/store/src/publ
         strictActionImmutability: true
       }
     }),
-    NgxElectronCoreModule.forRoot(),
-    NgxElectronStoreModule.forRoot()
+    NgxElectronCoreModule,
+    NgxElectronStoreModule
   ],
   providers: [],
   bootstrap: [AppComponent]

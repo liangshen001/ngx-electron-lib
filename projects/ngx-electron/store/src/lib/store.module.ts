@@ -12,12 +12,4 @@ import {StoreService} from './store.service';
   exports: []
 })
 export class StoreModule {
-  static forRoot(): ModuleWithProviders {
-    return {
-      ngModule: StoreModule,
-      providers: [
-        StoreService
-      ]
-    };
-  }
 }

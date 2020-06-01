@@ -3,16 +3,35 @@
     "type": "object",
     "properties": {
         "browserTarget": {
-            "type": "string"
+            "type": "string",
+            "description": "Target to serve.",
+            "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
         },
-        "command": {
-            "type": "string"
+        "electronRoot": {
+            "type": "string",
+            "description": "electron root."
         },
-        "args": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
+        "config": {
+            "type": "string",
+            "description": "electron builder config."
+        },
+        "win": {
+            "type": "boolean",
+            "description": "win."
+        },
+        "mac": {
+            "type": "boolean",
+            "description": "mac."
+        },
+        "linux": {
+            "type": "boolean",
+            "description": "linux."
         }
-    }
+    },
+    "additionalProperties": false,
+    "required": [
+        "browserTarget",
+        "electronRoot",
+        "config"
+    ]
 }

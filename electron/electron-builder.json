@@ -1,6 +1,6 @@
 {
   "appId": "com.liangshen",
-  "productName": "demo",
+  "productName": "ngx-electron-lib",
   "copyright": "Copyright©2018liangshen",
   "compression": "maximum",
   "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
@@ -8,7 +8,7 @@
     "output": "dist/electron/"
   },
   "files": [
-      "dist/demo/*",
+      "dist/ngx-electron-lib/*",
       "dist/electron/*"
   ],
   "dmg": {

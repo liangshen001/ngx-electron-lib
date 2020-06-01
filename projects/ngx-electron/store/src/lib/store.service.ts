@@ -5,7 +5,9 @@ import {concat, Observable} from 'rxjs';
 import {BrowserWindow, BrowserWindowConstructorOptions} from 'electron';
 import {NgxElectronService, ParentParams} from '@ngx-electron/core';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class StoreService {
   constructor(private store$: Store<any>,
               private ngZone: NgZone,

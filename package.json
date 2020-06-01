@@ -26,7 +26,8 @@
         "publish:@ngx-electron/store": "npm run build:@ngx-electron/store && npm run npm:scope:ngx-electron && npm publish --access public dist/ngx-electron/store",
         "publish:@ngx-electron/cli": "npm run build:@ngx-electron/cli && npm run npm:scope:ngx-electron && npm publish --access public projects/ngx-electron/cli",
         "login:group": "npm login -registry https://registry.npmjs.org/ -scope @ngx-electron",
-        "electron-build": "ng run ngx-electron:electron-build"
+        "electron-build": "ng run ngx-electron-lib:electron-build:win-production",
+        "electron-server-start": "ng run ngx-electron-lib:electron-server-start:production"
     },
     "private": true,
     "dependencies": {
@@ -41,8 +42,8 @@
         "@ngrx/effects": "^8.6.0",
         "@ngrx/entity": "^8.6.0",
         "@ngrx/store": "^8.6.0",
+        "@ngx-electron/main": "file:./projects/ngx-electron/main",
         "commander": "^4.0.1",
-        "electron": "^7.1.7",
         "electron-reload": "^1.5.0",
         "electron-updater": "^4.2.0",
         "fs-extra": "^8.1.0",
@@ -51,9 +52,9 @@
         "zone.js": "~0.9.1"
     },
     "devDependencies": {
+        "electron": "^7.1.7",
         "@ngx-electron/builder": "file:./projects/ngx-electron/builder",
         "@ngx-electron/cli": "file:./projects/ngx-electron/cli",
-        "@ngx-electron/main": "file:./projects/ngx-electron/main",
         "@angular-devkit/architect": "^0.803.21",
         "@angular-devkit/core": "^8.3.21",
         "@angular-devkit/build-angular": "~0.803.21",
@@ -77,6 +78,7 @@
         "ts-node": "~7.0.0",
         "tsickle": "^0.37.0",
         "tslint": "~5.15.0",
-        "typescript": "~3.5.3"
+        "typescript": "~3.5.3",
+        "electron-builder": "22.6.1"
     }
 }
