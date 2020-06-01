@@ -30,6 +30,12 @@
       ],
       "@ngx-electron/store/*": [
         "dist/ngx-electron/store/*"
+      ],
+      "@ngx-electron/schematics": [
+        "dist/ngx-electron/schematics"
+      ],
+      "@ngx-electron/schematics/*": [
+        "dist/ngx-electron/schematics/*"
       ]
     }
   },
