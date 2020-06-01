@@ -8,6 +8,7 @@ import {fromPromise} from 'rxjs/internal-compatibility';
 
 interface ServerStartBuilderOptions extends JsonObject {
     devServerTarget: string;
+    openDevTools: boolean;
 }
 
 export default createBuilder<ServerStartBuilderOptions>(commandBuilder);
@@ -29,7 +30,8 @@ function commandBuilder(
             }).pipe(
                 flatMap(data => spawn(context, 'electron', ['.', '--server', ...getOptions({
                     host: rawBrowserOptions.host,
-                    port: rawBrowserOptions.port
+                    port: rawBrowserOptions.port,
+                    'open-dev-tools': rawBrowserOptions.openDevTools
                 }, true)]).pipe(
                     map(() => data)
                 ))

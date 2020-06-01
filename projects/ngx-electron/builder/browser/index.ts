@@ -1,25 +1,29 @@
-import {BuilderContext, BuilderOutput, createBuilder} from '@angular-devkit/architect';
+import {BuilderContext, BuilderOutput, createBuilder, targetFromTargetString} from '@angular-devkit/architect';
 import {JsonObject} from '@angular-devkit/core';
-import * as childProcess from 'child_process';
 import {BrowserBuilderOutput, executeBrowserBuilder} from '@angular-devkit/build-angular';
 import {Observable, of} from 'rxjs';
-import {Schema as BrowserBuilderSchema} from './schema';
 import {flatMap, map, switchMap} from 'rxjs/operators';
+import {fromPromise} from 'rxjs/internal-compatibility';
 
-export default createBuilder<JsonObject & BrowserBuilderSchema>(commandBuilder);
+export default createBuilder<BrowserBuilderOptions>(commandBuilder);
+
+interface BrowserBuilderOptions extends JsonObject {
+    browserTarget: string;
+}
 
 function commandBuilder(
-    options: BrowserBuilderSchema,
+    options: BrowserBuilderOptions,
     context: BuilderContext,
 ): Observable<BrowserBuilderOutput> {
-    return executeBrowserBuilder(options, context as any, {
-        webpackConfiguration: config => ({
-            ...config,
-            ...options.electron ? {
-                target: 'electron-renderer'
-            } : {
-                node: {fs: 'empty'}
-            }
+    const browserTarget = targetFromTargetString(options.browserTarget);
+    return fromPromise(context.getTargetOptions(browserTarget)).pipe(
+        flatMap(rawBrowserOptions => {
+            return executeBrowserBuilder(rawBrowserOptions as any, context as any, {
+                webpackConfiguration: config => ({
+                    ...config,
+                    node: {fs: 'empty'}
+                })
+            });
         })
-    });
+    );
 }

@@ -5,11 +5,10 @@ let win: BrowserWindow;
 initElectronMainIpcListener();
 
 function init() {
-    createTray('icon/logo.png');
+    // createTray('icon/logo.png');
     win = createWindow('page1', {
         width: 1024,
-        height: 768,
-        title: 'demo'
+        height: 768
     });
     win.on('close', () => app.quit());
 }

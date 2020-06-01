@@ -31,7 +31,6 @@ function createWindow(routerUrl: string, options: BrowserWindowConstructorOption
         require('electron-reload')(app.getAppPath(), {
             electron: require(`${app.getAppPath()}/node_modules/electron`)
         });
-        console.log(1111111111);
         const loadUrl = `http://${ host }:${ port }/#${ routerUrl }`;
         console.log(`创建窗口加载服务：${loadUrl}`);
         win.loadURL(loadUrl);

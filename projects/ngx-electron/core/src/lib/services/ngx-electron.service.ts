@@ -5,6 +5,8 @@ import {ParentParams, TrayProxy} from '../models';
 import {IpcRenderer, WebFrame, Remote, BrowserWindowConstructorOptions, MenuItemConstructorOptions, BrowserWindow} from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as url from 'url';
+import * as path from 'path';
 
 // If you import a module but never use any of the imported values other than as TypeScript types,
 // the resulting javascript file will look as if you never imported the module at all.
@@ -96,15 +98,15 @@ export class NgxElectronService {
             },
             ...options
         });
-        const url = this.isServer() ? `http://${location.hostname}:${location.port}/#${routerUrl}` :
-            `${window['require']('url').format({
-                pathname: window['require']('path').join(this.remote.app.getAppPath(),
+        const httpUrl = this.isServer() ? `http://${location.hostname}:${location.port}/#${routerUrl}` :
+            `${url.format({
+                pathname: path.join(this.remote.app.getAppPath(),
                     'dist', this.remote.app.getName(), 'index.html'),
                 protocol: 'file:',
                 slashes: true
             })}#${routerUrl}`;
-        console.log(`加载url:${url}`);
-        win.loadURL(url);
+        console.log(`加载url:${httpUrl}`);
+        win.loadURL(httpUrl);
         if (this.isOpenDevTools()) {
             win.webContents.openDevTools();
         }

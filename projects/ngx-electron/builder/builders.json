@@ -9,6 +9,16 @@
             "implementation": "./server-start",
             "schema": "./server-start/schema.json",
             "description": "server-start."
+        },
+        "local-start": {
+            "implementation": "./local-start",
+            "schema": "./local-start/schema.json",
+            "description": "local-start."
+        },
+        "browser": {
+            "implementation": "./browser",
+            "schema": "./browser/schema.json",
+            "description": "browser."
         }
     }
 }

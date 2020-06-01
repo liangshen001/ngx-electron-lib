@@ -1,26 +1,21 @@
-import {BuilderContext, createBuilder, targetFromTargetString} from '@angular-devkit/architect';
-import { JsonObject } from '@angular-devkit/core';
-import {BrowserBuilderOutput, executeBrowserBuilder} from '@angular-devkit/build-angular';
+import {BrowserBuilderOutput, DevServerBuilderOutput, executeBrowserBuilder, executeDevServerBuilder} from '@angular-devkit/build-angular';
 import {Observable} from 'rxjs';
+import {BuilderContext, createBuilder, targetFromTargetString} from '@angular-devkit/architect';
 import {flatMap, map} from 'rxjs/operators';
 import {getOptions, spawn} from '../utils';
-import * as path from 'path';
+import {JsonObject} from '@angular-devkit/core';
 import {fromPromise} from 'rxjs/internal-compatibility';
+import * as path from 'path';
 
-
-interface BuildBuilderSchema extends JsonObject {
+interface ServerStartBuilderOptions extends JsonObject {
     browserTarget: string;
     electronRoot: string;
-    config: string;
-    mac: boolean;
-    linux: boolean;
-    win: boolean;
 }
 
-export default createBuilder<BuildBuilderSchema>(commandBuilder);
+export default createBuilder<ServerStartBuilderOptions>(commandBuilder);
 
 function commandBuilder(
-    options: BuildBuilderSchema,
+    options: ServerStartBuilderOptions,
     context: BuilderContext,
 ): Observable<BrowserBuilderOutput> {
     const browserTarget = targetFromTargetString(options.browserTarget);
@@ -37,18 +32,8 @@ function commandBuilder(
         flatMap(data => spawn(context, 'tsc', ['-p', path.join(process.cwd(), options.electronRoot)]).pipe(
             map(() => data)
         )),
-        flatMap(data => spawn(context, 'electron-builder', [
-            'build',
-            ...getOptions({
-                win: options.win,
-                mac: options.mac,
-                linux: options.linux
-            }),
-            ...getOptions({
-                config: `${path.join(process.cwd(), options.config)}`
-            }, true)
-        ]).pipe(
+        flatMap(data => spawn(context, 'electron', ['.', '--open-dev-tools']).pipe(
             map(() => data)
-        ))
+        )),
     );
 }
