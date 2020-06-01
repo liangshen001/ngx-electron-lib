@@ -26,7 +26,8 @@
         "publish:@ngx-electron/store": "npm run build:@ngx-electron/store && npm run npm:scope:ngx-electron && npm publish --access public dist/ngx-electron/store",
         "publish:@ngx-electron/cli": "npm run build:@ngx-electron/cli && npm run npm:scope:ngx-electron && npm publish --access public projects/ngx-electron/cli",
         "login:group": "npm login -registry https://registry.npmjs.org/ -scope @ngx-electron",
-        "electron-build": "ng run ngx-electron-lib:electron-build:win-production",
+        "electron-build:win": "ng run ngx-electron-lib:electron-build:win-production",
+        "electron-build:mac": "ng run ngx-electron-lib:electron-build:mac-production",
         "electron-server-start": "ng run ngx-electron-lib:electron-server-start:production"
     },
     "private": true,

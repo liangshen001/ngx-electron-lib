@@ -134,6 +134,10 @@
                         "win-production": {
                             "browserTarget": "ngx-electron-lib:build:production",
                             "win": true
+                        },
+                        "mac-production": {
+                            "browserTarget": "ngx-electron-lib:build:production",
+                            "mac": true
                         }
                     }
                 },
