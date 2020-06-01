@@ -1,6 +1,7 @@
 {
-    "name": "@ngx-electron/build",
+    "name": "@ngx-electron/builder",
     "version": "0.0.1",
+    "main": "command/index.js",
     "peerDependencies": {
         "@angular/common": "^8.2.14",
         "@angular/core": "^8.2.14"

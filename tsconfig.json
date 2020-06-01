@@ -19,18 +19,6 @@
       "dom"
     ],
     "paths": {
-      "@ngx-electron/cli": [
-        "dist/ngx-electron/cli"
-      ],
-      "@ngx-electron/cli/*": [
-        "dist/ngx-electron/cli/*"
-      ],
-      "@ngx-electron/main": [
-        "dist/ngx-electron/main"
-      ],
-      "@ngx-electron/main/*": [
-        "dist/ngx-electron/main/*"
-      ],
       "@ngx-electron/core": [
         "dist/ngx-electron/core"
       ],
@@ -42,12 +30,6 @@
       ],
       "@ngx-electron/store/*": [
         "dist/ngx-electron/store/*"
-      ],
-      "@ngx-electron/build": [
-        "dist/ngx-electron/build"
-      ],
-      "@ngx-electron/build/*": [
-        "dist/ngx-electron/build/*"
       ]
     }
   },

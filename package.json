@@ -18,16 +18,15 @@
         "build:@ngx-electron": "npm run build:@ngx-electron/core && npm run build:@ngx-electron/store && npm run build:@ngx-electron/main && npm run build:@ngx-electron/cli",
         "build:@ngx-electron/core": "ng build @ngx-electron/core",
         "build:@ngx-electron/store": "ng build @ngx-electron/store",
-        "build:@ngx-electron/main": "tsc -p ./projects/ngx-electron/main && npm link ./projects/ngx-electron/main",
+        "build:@ngx-electron/main": "tsc -p ./projects/ngx-electron/main",
         "build:@ngx-electron/cli": "tsc -p ./projects/ngx-electron/cli",
-        "build:@ngx-electron/build": "ng build @ngx-electron/build",
-        "link:@ngx-electron/cli": "npm link ./projects/ngx-electron/cli",
-        "unlink:@ngx-electron/cli": "npm unlink ./projects/ngx-electron/cli",
+        "build:@ngx-electron/builder": "tsc -p projects/ngx-electron/builder",
         "publish:@ngx-electron/main": "npm run build:@ngx-electron/main && npm run npm:scope:ngx-electron && npm publish --access public projects/ngx-electron/main",
         "publish:@ngx-electron/core": "npm run build:@ngx-electron/core && npm run npm:scope:ngx-electron && npm publish --access public dist/ngx-electron/core",
         "publish:@ngx-electron/store": "npm run build:@ngx-electron/store && npm run npm:scope:ngx-electron && npm publish --access public dist/ngx-electron/store",
         "publish:@ngx-electron/cli": "npm run build:@ngx-electron/cli && npm run npm:scope:ngx-electron && npm publish --access public projects/ngx-electron/cli",
-        "login:group": "npm login -registry https://registry.npmjs.org/ -scope @ngx-electron"
+        "login:group": "npm login -registry https://registry.npmjs.org/ -scope @ngx-electron",
+        "electron-build": "ng run ngx-electron:electron-build"
     },
     "private": true,
     "dependencies": {
@@ -52,7 +51,9 @@
         "zone.js": "~0.9.1"
     },
     "devDependencies": {
-        "@ngx-electron/build": "file:./dist/ngx-electron/build",
+        "@ngx-electron/builder": "file:./projects/ngx-electron/builder",
+        "@ngx-electron/cli": "file:./projects/ngx-electron/cli",
+        "@ngx-electron/main": "file:./projects/ngx-electron/main",
         "@angular-devkit/architect": "^0.803.21",
         "@angular-devkit/core": "^8.3.21",
         "@angular-devkit/build-angular": "~0.803.21",

@@ -4,7 +4,7 @@ import {User} from '../../../../models/user';
 import {select, Store} from '@ngrx/store';
 import {AddUser, DeleteUser, UpdateUser} from '../../../../actions/user.action';
 import {getAllUsers, UserReducerState} from '../../../../reducers/user.reducer';
-import {NgxElectronStoreService} from '@ngx-electron/store';
+import {NgxElectronStoreService} from '../../../../../../projects/ngx-electron/store/src/public-api';
 
 @Component({
     selector: 'app-user-table',

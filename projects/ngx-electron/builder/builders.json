@@ -4,6 +4,11 @@
             "implementation": "./command",
             "schema": "./command/schema.json",
             "description": "Runs any command line in the operating system."
+        },
+        "build": {
+            "implementation": "./build",
+            "schema": "./build/schema.json",
+            "description": "Runs any command line in the operating system."
         }
     }
 }

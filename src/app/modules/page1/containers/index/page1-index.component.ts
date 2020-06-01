@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {NgxElectronService} from '@ngx-electron/core';
 import {select, Store} from '@ngrx/store';
 import {map, take} from 'rxjs/operators';
 import {UserReducerState, getAllUsers} from '../../../../reducers/user.reducer';
-import {NgxElectronStoreService} from '@ngx-electron/store';
 import {LoadUserList, LoadUserListSuccess} from '../../../../actions/user.action';
+import {NgxElectronService} from '../../../../../../projects/ngx-electron/core/src/lib/services/ngx-electron.service';
+import {NgxElectronStoreService} from '../../../../../../projects/ngx-electron/store/src/public-api';
 
 @Component({
   selector: 'app-page1',

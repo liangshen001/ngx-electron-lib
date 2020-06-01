@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {NgxElectronService} from '@ngx-electron/core';
 import {Observable} from 'rxjs';
+import {NgxElectronService} from '../../../../../../projects/ngx-electron/core/src/lib/services/ngx-electron.service';
 
 @Component({
     selector: 'app-page2',

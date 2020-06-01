@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "type": "object",
+    "properties": {
+        "browserTarget": {
+            "type": "string"
+        },
+        "command": {
+            "type": "string"
+        },
+        "args": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    }
+}
