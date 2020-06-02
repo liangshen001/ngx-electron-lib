@@ -5,6 +5,7 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 export function ngAdd(options: any): Rule {
     return (tree: Tree, context: SchematicContext) => {
         options.addTask(new NodePackageInstallTask());
+        context.addTask(new NodePackageInstallTask());
         return tree;
     };
 }

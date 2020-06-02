@@ -1,7 +1,7 @@
 {
     "extends": "../../../tsconfig.json",
     "compilerOptions": {
-        "outDir": "./",
+        "outDir": "../../../dist/ngx-electron/builder",
         "target": "es5",
         "module": "commonjs",
         "moduleResolution": "node",
@@ -11,20 +11,17 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "importHelpers": true,
+        "resolveJsonModule": true,
         "types": [],
         "lib": [
             "dom",
             "es2018"
         ]
     },
-    "angularCompilerOptions": {
-        "annotateForClosureCompiler": true,
-        "skipTemplateCodegen": true,
-        "strictMetadataEmit": true,
-        "fullTemplateTypeCheck": true,
-        "strictInjectionParameters": true,
-        "enableResourceInlining": true
-    },
+    "include": [
+        "**/*",
+        "./**/*.json"
+    ],
     "exclude": [
         "src/test.ts",
         "**/*.spec.ts"

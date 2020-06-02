@@ -14,12 +14,13 @@
         "noImplicitThis": true,
         "noUnusedParameters": true,
         "noUnusedLocals": true,
-        "rootDir": "schematics",
-        "outDir": "../../dist/my-lib/schematics",
+        "rootDir": ".",
+        "outDir": "../../../dist/ngx-electron/schematics",
         "skipDefaultLibCheck": true,
         "skipLibCheck": true,
         "sourceMap": true,
         "strictNullChecks": true,
+        "resolveJsonModule": true,
         "target": "es6",
         "types": [
             "jasmine",
@@ -27,9 +28,9 @@
         ]
     },
     "include": [
-        "schematics/**/*"
-    ],
-    "exclude": [
-        "schematics/*/files/**/*"
+        "./**/*",
+        "./**/*.json",
+        "package.json",
+        "collection.json"
     ]
 }
