@@ -8,7 +8,8 @@ function init() {
     // createTray('icon/logo.png');
     win = createWindow('page1', {
         width: 1024,
-        height: 768
+        height: 768,
+        title: 'test'
     });
     win.on('close', () => app.quit());
 }

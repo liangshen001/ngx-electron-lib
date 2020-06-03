@@ -1,6 +1,6 @@
 {
     "name": "@ngx-electron/cli",
-    "version": "8.7.16",
+    "version": "8.8.0",
     "main": "index.js",
     "dependencies": {
         "commander": "^4.0.1",

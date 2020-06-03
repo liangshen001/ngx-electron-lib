@@ -1,7 +1,7 @@
 {
     "extends": "../../../tsconfig.json",
     "compilerOptions": {
-        "outDir": "./",
+        "outDir": "../../../dist/ngx-electron/cli",
         "target": "es5",
         "module": "commonjs",
         "moduleResolution": "node",
@@ -11,12 +11,17 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "importHelpers": true,
+        "resolveJsonModule": true,
         "types": [],
         "lib": [
             "dom",
             "es2018"
         ]
     },
+    "include": [
+        "**/*",
+        "./**/*.json"
+    ],
     "exclude": [
         "src/test.ts",
         "**/*.spec.ts",

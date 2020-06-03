@@ -16,9 +16,6 @@ const winIdMap = new Map<any, number>();
  */
 function createWindow(routerUrl: string, options: BrowserWindowConstructorOptions = {}, key = routerUrl): BrowserWindow {
     let win = new BrowserWindow({
-        hasShadow: true,
-        frame: false,
-        transparent: true,
         show: false,
         webPreferences: {
           nodeIntegration: true,

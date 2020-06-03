@@ -8,11 +8,6 @@
             "type": "string",
             "description": "Target to serve.",
             "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
-        },
-        "openDevTools": {
-            "type": "boolean",
-            "description": "Target to serve.",
-            "default": true
         }
     },
     "additionalProperties": false,

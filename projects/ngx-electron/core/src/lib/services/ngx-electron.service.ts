@@ -90,8 +90,8 @@ export class NgxElectronService {
     }
 
     createWindow(routerUrl: string, key: string, options: BrowserWindowConstructorOptions) {
+        console.log(1111111111111111111111111111111111111111111111111);
         let win = new this.remote.BrowserWindow({
-            ...this.defaultWinOptions,
             webPreferences: {
                 nodeIntegration: true,
                 webSecurity: false
