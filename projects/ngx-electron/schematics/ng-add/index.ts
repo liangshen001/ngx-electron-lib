@@ -3,7 +3,7 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import {addToPackageJson} from './package-config';
 
 
-const ngxElectronVersion = '~8.8.5';
+const ngxElectronVersion = '~8.8.6';
 
 const mainTsContent = `import {app, BrowserWindow} from 'electron';
 import {createTray, createWindow, initElectronMainIpcListener, isMac} from '@ngx-electron/main';
@@ -108,13 +108,13 @@ const tsconfigJsonContent = `{
     "extends": "../tsconfig.json",
     "compilerOptions": {
         "outDir": "../dist",
-      "target": "es2015",
-      "module": "commonjs",
-      "moduleResolution": "node",
+        "target": "es2015",
+        "module": "commonjs",
+        "moduleResolution": "node",
         "resolveJsonModule": true
     },
-    "include": [
-        "./**/*"
+    "files": [
+        "main.ts"
     ]
 }
 `;
@@ -151,6 +151,7 @@ export function ngAdd(): Rule {
         const sourceText = tree.read('package.json')!.toString('utf-8');
         const json = JSON.parse(sourceText);
         json.main = 'dist/electron/main.js';
+        tree.overwrite('package.json', json);
         addToPackageJson(tree, '@ngx-electron/main', ngxElectronVersion, 'dependencies');
         addToPackageJson(tree, '@ngx-electron/builder', ngxElectronVersion, 'devDependencies');
         addToPackageJson(tree, '@ngx-electron/core', ngxElectronVersion, 'devDependencies');
