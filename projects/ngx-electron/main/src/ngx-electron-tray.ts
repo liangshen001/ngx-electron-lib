@@ -29,7 +29,7 @@ function convertImgToNativeImage(imageUrl, isWeb): Promise<NativeImage | string>
             });
         } else {
             const image = nativeImage.createFromDataURL(
-                path.join(app.getAppPath(), 'dist', app.getName(), 'assets', imageUrl));
+                path.join(app.getAppPath(), 'dist', app.name, 'assets', imageUrl));
             resolve(image);
         }
     });

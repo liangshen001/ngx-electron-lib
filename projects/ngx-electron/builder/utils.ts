@@ -3,6 +3,7 @@ import * as childProcess from 'child_process';
 import {Observable} from 'rxjs';
 
 export function spawn(context: BuilderContext, command: string, args?: string[], options?: childProcess.SpawnOptions) {
+    context.logger.info(`run:${command} args:${args}`);
     const child = childProcess.spawn(process.platform === 'win32' ? `${command}.cmd` : command, args, options);
     child.stdout.on('data', data => context.logger.info(data.toString()));
     child.stderr.on('data', data => context.logger.error(data.toString()));

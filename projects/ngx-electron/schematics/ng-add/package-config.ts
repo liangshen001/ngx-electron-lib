@@ -1,26 +1,5 @@
-import {SchematicContext, Tree} from '@angular-devkit/schematics';
+import {Tree} from '@angular-devkit/schematics';
 
-
-/** The shortcut of `addPackageToPackageJson` */
-export function addPackage(host: Tree, context: SchematicContext, pkgverion: string, type = '') {
-    const pos = pkgverion.lastIndexOf('@');
-    const pkg = pkgverion.substring(0, pos);
-    const verstion = pkgverion.substring(pos + 1);
-
-    if (host.exists('tsconfig.json')) {
-        const tsconfigText = host.read('tsconfig.json')!.toString('utf-8');
-        const tsconfigJson = JSON.parse(tsconfigText);
-        if (tsconfigJson.compilerOptions) {
-            if (tsconfigJson.compilerOptions.paths && tsconfigJson.compilerOptions.paths[pkg]) {
-                context.logger.warn(pkg + ' already exists in the library;');
-                return;
-            }
-            type === 'dev'
-                ? addToPackageJson(host, pkg, verstion, 'devDependencies')
-                : addToPackageJson(host, pkg, verstion, 'dependencies');
-        }
-    }
-}
 /**
  * Sorts the keys of the given object.
  * @returns A new object instance with sorted keys
@@ -37,7 +16,6 @@ export function addToPackageJson(
     value: string,
     type: 'dependencies' | 'devDependencies' | 'scripts' = 'dependencies'
 ): Tree {
-
     if (host.exists('package.json')) {
         const sourceText = host.read('package.json')!.toString('utf-8');
         const json = JSON.parse(sourceText);
@@ -53,6 +31,5 @@ export function addToPackageJson(
 
         host.overwrite('package.json', JSON.stringify(json, null, 2));
     }
-
     return host;
 }

@@ -1,6 +1,9 @@
 import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import {addKeyPkgsToPackageJson, addScriptsToPackageJson} from './packages';
+import {addToPackageJson} from './package-config';
+
+
+const ngxElectronVersion = '~8.8.3';
 
 const mainTsContent = `import {app, BrowserWindow} from 'electron';
 import {createTray, createWindow, initElectronMainIpcListener, isMac} from '@ngx-electron/main';
@@ -104,13 +107,14 @@ const electronBuilderJsonContent = '{\n' +
 const tsconfigJsonContent = `{
     "extends": "../tsconfig.json",
     "compilerOptions": {
-        "outDir": "../dist/electron",
+        "outDir": "../dist",
       "target": "es2015",
       "module": "commonjs",
-      "moduleResolution": "node"
+      "moduleResolution": "node",
+        "resolveJsonModule": true
     },
-    "files": [
-        "./main.ts"
+    "include": [
+        "./**/*"
     ]
 }
 `;
@@ -122,21 +126,40 @@ export function ngAdd(): Rule {
             context.logger.error('This is not an angular cli application');
             return;
         }
-        addScriptsToPackageJson(tree);
-        addKeyPkgsToPackageJson(tree);
-        addArchitectToAngularJson(tree, context);
-        if (tree.exists('electron')) {
-            context.logger.info('electron dirs already existed');
-        }
         tree.create('/electron/main.ts', mainTsContent);
         tree.create('/electron/electron-builder.json', electronBuilderJsonContent);
         tree.create('/electron/tsconfig.json', tsconfigJsonContent);
+
+        const angularText = tree.get('angular.json')!.content.toString('utf-8');
+        const angularJson = JSON.parse(angularText);
+        angularJson.main = 'dist/electron/main.js';
+
+        addToPackageJson(tree, 'electron-browser',
+            'ng run ' + angularJson.defaultProject + ':electron-browser:production', 'scripts');
+        addToPackageJson(tree, 'electron-server-start',
+            'ng run ' + angularJson.defaultProject + ':electron-server-start:production', 'scripts');
+        addToPackageJson(tree, 'electron-local-start',
+            'ng run ' + angularJson.defaultProject + ':electron-local-start:production', 'scripts');
+        addToPackageJson(tree, 'electron-build:win',
+            'ng run ' + angularJson.defaultProject + ':electron-build:production --win=true', 'scripts');
+        addToPackageJson(tree, 'electron-build:mac',
+            'ng run ' + angularJson.defaultProject + ':electron-build:production --mac=true', 'scripts');
+        addToPackageJson(tree, 'electron-build:linux',
+            'ng run ' + angularJson.defaultProject + ':electron-build:production --linux=true', 'scripts');
+
+        addToPackageJson(tree, '@ngx-electron/main', ngxElectronVersion, 'dependencies');
+        addToPackageJson(tree, '@ngx-electron/builder', ngxElectronVersion, 'devDependencies');
+        addToPackageJson(tree, '@ngx-electron/core', ngxElectronVersion, 'devDependencies');
+        addToPackageJson(tree, 'electron-updater', '~4.2.0', 'dependencies');
+        addToPackageJson(tree, 'electron-reload', '~1.5.0', 'dependencies');
+        addToPackageJson(tree, 'electron', '~7.1.7', 'devDependencies');
+        addArchitectToAngularJson(tree);
         context.addTask(new NodePackageInstallTask());
         return tree;
     };
 }
 
-function addArchitectToAngularJson(tree: Tree, context: SchematicContext) {
+function addArchitectToAngularJson(tree: Tree) {
     const angularText = tree.get('angular.json')!.content.toString('utf-8');
     const angularJson = JSON.parse(angularText);
     const architect = angularJson.projects[angularJson.defaultProject].architect;
@@ -154,7 +177,6 @@ function addArchitectToAngularJson(tree: Tree, context: SchematicContext) {
                 }
             }
         };
-        context.logger.info('create electron-build architect success');
     }
     if (!architect['electron-server-start']) {
         architect['electron-server-start'] = {
@@ -168,7 +190,6 @@ function addArchitectToAngularJson(tree: Tree, context: SchematicContext) {
                 }
             }
         };
-        context.logger.info('create electron-server-start architect success');
     }
     if (!architect['electron-local-start']) {
         architect['electron-local-start'] = {
@@ -183,7 +204,6 @@ function addArchitectToAngularJson(tree: Tree, context: SchematicContext) {
                 }
             }
         };
-        context.logger.info('create electron-local-start architect success');
     }
     if (!architect['electron-browser']) {
         architect['electron-browser'] = {
@@ -197,6 +217,6 @@ function addArchitectToAngularJson(tree: Tree, context: SchematicContext) {
                 }
             }
         };
-        context.logger.info('create electron-browser architect success');
     }
+    tree.overwrite('angular.json', JSON.stringify(angularJson, null, 2));
 }

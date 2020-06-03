@@ -6,7 +6,7 @@ initElectronMainIpcListener();
 
 function init() {
     // createTray('icon/logo.png');
-    win = createWindow('page1', {
+    win = createWindow('', {
         width: 1024,
         height: 768,
         title: 'test'

@@ -101,7 +101,7 @@ export class NgxElectronService {
         const httpUrl = this.isServer() ? `http://${location.hostname}:${location.port}/#${routerUrl}` :
             `${url.format({
                 pathname: path.join(this.remote.app.getAppPath(),
-                    'dist', this.remote.app.getName(), 'index.html'),
+                    'dist', this.remote.app.name, 'index.html'),
                 protocol: 'file:',
                 slashes: true
             })}#${routerUrl}`;

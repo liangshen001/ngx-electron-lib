@@ -30,7 +30,7 @@ export class Page1IndexComponent implements OnInit {
         // });
         // const httpurl = `${url.format({
         //     pathname: path.join(this.electronService.remote.app.getAppPath(),
-        //         'dist', this.electronService.remote.app.getName(), 'index.html'),
+        //         'dist', this.electronService.remote.app.name(), 'index.html'),
         //     protocol: 'file:',
         //     slashes: true
         // })}#page2`;
