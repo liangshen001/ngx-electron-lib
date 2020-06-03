@@ -3,7 +3,7 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import {addToPackageJson} from './package-config';
 
 
-const ngxElectronVersion = '~8.8.3';
+const ngxElectronVersion = '~8.8.4';
 
 const mainTsContent = `import {app, BrowserWindow} from 'electron';
 import {createTray, createWindow, initElectronMainIpcListener, isMac} from '@ngx-electron/main';
@@ -13,7 +13,7 @@ initElectronMainIpcListener();
 
 function init() {
     // createTray('icon/logo.png');
-    win = createWindow('page1', {
+    win = createWindow('', {
         width: 1024,
         height: 768,
         title: 'test'
