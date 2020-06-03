@@ -16,20 +16,18 @@ export function addToPackageJson(
     value: string,
     type: 'dependencies' | 'devDependencies' | 'scripts' = 'dependencies'
 ): Tree {
-    if (host.exists('package.json')) {
-        const sourceText = host.read('package.json')!.toString('utf-8');
-        const json = JSON.parse(sourceText);
+    const sourceText = host.read('package.json')!.toString('utf-8');
+    const json = JSON.parse(sourceText);
 
-        if (!json[type]) {
-            json[type] = {};
-        }
-
-        if (!json[type][key]) {
-            json[type][key] = value;
-            json[type] = sortObjectByKeys(json[type]);
-        }
-
-        host.overwrite('package.json', JSON.stringify(json, null, 2));
+    if (!json[type]) {
+        json[type] = {};
     }
+
+    if (!json[type][key]) {
+        json[type][key] = value;
+        json[type] = sortObjectByKeys(json[type]);
+    }
+
+    host.overwrite('package.json', JSON.stringify(json, null, 2));
     return host;
 }

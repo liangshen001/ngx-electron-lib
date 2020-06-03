@@ -3,7 +3,7 @@ import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import {addToPackageJson} from './package-config';
 
 
-const ngxElectronVersion = '~8.8.4';
+const ngxElectronVersion = '~8.8.5';
 
 const mainTsContent = `import {app, BrowserWindow} from 'electron';
 import {createTray, createWindow, initElectronMainIpcListener, isMac} from '@ngx-electron/main';
@@ -126,13 +126,13 @@ export function ngAdd(): Rule {
             context.logger.error('This is not an angular cli application');
             return;
         }
+
         tree.create('/electron/main.ts', mainTsContent);
         tree.create('/electron/electron-builder.json', electronBuilderJsonContent);
         tree.create('/electron/tsconfig.json', tsconfigJsonContent);
 
         const angularText = tree.get('angular.json')!.content.toString('utf-8');
         const angularJson = JSON.parse(angularText);
-        angularJson.main = 'dist/electron/main.js';
 
         addToPackageJson(tree, 'electron-browser',
             'ng run ' + angularJson.defaultProject + ':electron-browser:production', 'scripts');
@@ -147,6 +147,10 @@ export function ngAdd(): Rule {
         addToPackageJson(tree, 'electron-build:linux',
             'ng run ' + angularJson.defaultProject + ':electron-build:production --linux=true', 'scripts');
 
+
+        const sourceText = tree.read('package.json')!.toString('utf-8');
+        const json = JSON.parse(sourceText);
+        json.main = 'dist/electron/main.js';
         addToPackageJson(tree, '@ngx-electron/main', ngxElectronVersion, 'dependencies');
         addToPackageJson(tree, '@ngx-electron/builder', ngxElectronVersion, 'devDependencies');
         addToPackageJson(tree, '@ngx-electron/core', ngxElectronVersion, 'devDependencies');
