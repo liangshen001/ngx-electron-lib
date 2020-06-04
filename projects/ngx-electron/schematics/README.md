@@ -1,6 +1,6 @@
 # @ngx-electron/schematics
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.14.
+angular version 8.2.14.
 
 ```
 ng new ngx-electron-test

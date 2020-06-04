@@ -1,11 +1,9 @@
 import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import {addToPackageJson} from './package-config';
 
+const ngxElectronVersion = require('../package.json').version;
 
-const ngxElectronVersion = '~8.8.6';
-
-const mainTsContent = `import {app, BrowserWindow} from 'electron';
+const mainTsContent = (name: string) => `import {app, BrowserWindow} from 'electron';
 import {createTray, createWindow, initElectronMainIpcListener, isMac} from '@ngx-electron/main';
 
 let win: BrowserWindow;
@@ -16,7 +14,7 @@ function init() {
     win = createWindow('', {
         width: 1024,
         height: 768,
-        title: 'test'
+        title: '${name}'
     });
     win.on('close', () => app.quit());
 }
@@ -44,9 +42,9 @@ app.on('activate', () => {
     }
 });`;
 
-const electronBuilderJsonContent = '{\n' +
-    '  "appId": "appId",\n' +
-    '  "productName": "productName",\n' +
+const electronBuilderJsonContent = (name: string) => '{\n' +
+    '  "appId": "' + name + '",\n' +
+    '  "productName": "' + name + '",\n' +
     '  "copyright": "Copyright©2020",\n' +
     '  "compression": "maximum",\n' +
     '  "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",\n' +
@@ -107,7 +105,7 @@ const electronBuilderJsonContent = '{\n' +
 const tsconfigJsonContent = `{
     "extends": "../tsconfig.json",
     "compilerOptions": {
-        "outDir": "../dist",
+        "outDir": "../dist/electron",
         "target": "es2015",
         "module": "commonjs",
         "moduleResolution": "node",
@@ -119,6 +117,7 @@ const tsconfigJsonContent = `{
 }
 `;
 
+
 // Just return the tree
 export function ngAdd(): Rule {
     return (tree: Tree, context: SchematicContext) => {
@@ -127,12 +126,13 @@ export function ngAdd(): Rule {
             return;
         }
 
-        tree.create('/electron/main.ts', mainTsContent);
-        tree.create('/electron/electron-builder.json', electronBuilderJsonContent);
-        tree.create('/electron/tsconfig.json', tsconfigJsonContent);
-
         const angularText = tree.get('angular.json')!.content.toString('utf-8');
         const angularJson = JSON.parse(angularText);
+
+        tree.create('/electron/main.ts', mainTsContent(angularJson.defaultProject));
+        tree.create('/electron/electron-builder.json', electronBuilderJsonContent(angularJson.defaultProject));
+        tree.create('/electron/tsconfig.json', tsconfigJsonContent);
+
 
         addToPackageJson(tree, 'electron-browser',
             'ng run ' + angularJson.defaultProject + ':electron-browser:production', 'scripts');
@@ -148,16 +148,17 @@ export function ngAdd(): Rule {
             'ng run ' + angularJson.defaultProject + ':electron-build:production --linux=true', 'scripts');
 
 
-        const sourceText = tree.read('package.json')!.toString('utf-8');
-        const json = JSON.parse(sourceText);
-        json.main = 'dist/electron/main.js';
-        tree.overwrite('package.json', json);
         addToPackageJson(tree, '@ngx-electron/main', ngxElectronVersion, 'dependencies');
         addToPackageJson(tree, '@ngx-electron/builder', ngxElectronVersion, 'devDependencies');
         addToPackageJson(tree, '@ngx-electron/core', ngxElectronVersion, 'devDependencies');
         addToPackageJson(tree, 'electron-updater', '~4.2.0', 'dependencies');
         addToPackageJson(tree, 'electron-reload', '~1.5.0', 'dependencies');
         addToPackageJson(tree, 'electron', '~7.1.7', 'devDependencies');
+
+        const sourceText = tree.read('package.json')!.toString('utf-8');
+        const json = JSON.parse(sourceText);
+        json.main = 'dist/electron/main.js';
+        tree.overwrite('package.json', JSON.stringify(json, null, 2));
         addArchitectToAngularJson(tree);
         context.addTask(new NodePackageInstallTask());
         return tree;
@@ -224,4 +225,45 @@ function addArchitectToAngularJson(tree: Tree) {
         };
     }
     tree.overwrite('angular.json', JSON.stringify(angularJson, null, 2));
+}
+
+
+/**
+ * Sorts the keys of the given object.
+ * @returns A new object instance with sorted keys
+ */
+function sortObjectByKeys(obj: any) {
+    return Object.keys(obj)
+        .sort()
+        .reduce((result: any, key: string) => (result[key] = obj[key]) && result, {});
+}
+
+export function addToPackageJson(
+    host: Tree,
+    key: string,
+    value: string,
+    type: 'dependencies' | 'devDependencies' | 'scripts' = 'dependencies'
+): Tree {
+
+    const tsconfigText = host.read('tsconfig.json')!.toString('utf-8');
+    const tsconfigJson = JSON.parse(tsconfigText);
+
+    if (tsconfigJson.compilerOptions && tsconfigJson.compilerOptions.paths && tsconfigJson.compilerOptions.paths[key]) {
+        return host;
+    }
+
+    const sourceText = host.read('package.json')!.toString('utf-8');
+    const json = JSON.parse(sourceText);
+
+    if (!json[type]) {
+        json[type] = {};
+    }
+
+    if (!json[type][key]) {
+        json[type][key] = value;
+        json[type] = sortObjectByKeys(json[type]);
+    }
+
+    host.overwrite('package.json', JSON.stringify(json, null, 2));
+    return host;
 }

@@ -1,11 +1,11 @@
 {
-    "name": "@ngx-electron/builder",
-    "version": "8.8.6",
-    "main": "index.js",
-    "peerDependencies": {
-        "@angular/common": "^8.2.14",
-        "@angular/core": "^8.2.14",
-        "electron-builder": "22.7.0"
-    },
-    "builders": "builders.json"
+  "name": "@ngx-electron/builder",
+  "version": "8.8.16",
+  "main": "index.js",
+  "peerDependencies": {
+    "@angular/common": "^8.2.14",
+    "@angular/core": "^8.2.14",
+    "electron-builder": "22.7.0"
+  },
+  "builders": "builders.json"
 }

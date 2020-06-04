@@ -1,9 +1,9 @@
 {
-    "name": "@ngx-electron/schematics",
-    "version": "8.8.6",
-    "peerDependencies": {
-        "@angular/common": "^8.2.14",
-        "@angular/core": "^8.2.14"
-    },
-    "schematics": "./collection.json"
+  "name": "@ngx-electron/schematics",
+  "version": "8.8.16",
+  "peerDependencies": {
+    "@angular/common": "^8.2.14",
+    "@angular/core": "^8.2.14"
+  },
+  "schematics": "./collection.json"
 }
