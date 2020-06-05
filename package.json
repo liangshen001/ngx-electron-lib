@@ -1,6 +1,6 @@
 {
     "name": "ngx-electron-lib",
-    "version": "8.8.25",
+    "version": "8.8.26",
     "main": "dist/electron/main.js",
     "scripts": {
         "ng": "ng",
