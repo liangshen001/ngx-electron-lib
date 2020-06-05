@@ -32,7 +32,7 @@ function createWindow(routerUrl: string, options: BrowserWindowConstructorOption
         console.log(`创建窗口加载服务：${loadUrl}`);
         win.loadURL(loadUrl);
     } else {
-        const pathname = path.join(app.getAppPath(), `/dist/${ app.name }/index.html`);
+        const pathname = path.join(app.getAppPath(), `/dist/${ app.getName() }/index.html`);
         console.log(`创建本地文件窗口 pathname:${pathname}#${routerUrl}`);
         win.loadURL(url.format({
             pathname,

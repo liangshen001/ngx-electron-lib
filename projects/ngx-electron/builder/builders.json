@@ -19,6 +19,11 @@
             "implementation": "./browser",
             "schema": "./browser/schema.json",
             "description": "browser."
+        },
+        "dev-server": {
+            "implementation": "./dev-server",
+            "schema": "./dev-server/schema.json",
+            "description": "dev-server."
         }
     }
 }

@@ -1,9 +1,22 @@
 {
   "name": "@ngx-electron/core",
-  "version": "8.8.16",
+  "version": "8.8.25",
   "peerDependencies": {
     "@angular/common": "^8.2.14",
     "@angular/core": "^8.2.14",
     "electron": "^7.1.7"
-  }
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/liangshen001/ngx-electron-lib/issues"
+  },
+  "homepage": "https://github.com/liangshen001/ngx-electron-lib/blob/master/projects/ngx-electron/core/README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liangshen001/ngx-electron-lib.git"
+  },
+  "keywords": [
+    "angular",
+    "electron"
+  ]
 }

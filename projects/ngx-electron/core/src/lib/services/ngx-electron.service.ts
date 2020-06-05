@@ -2,7 +2,7 @@ import {Injectable, NgZone} from '@angular/core';
 import {Router} from '@angular/router';
 import {Observable} from 'rxjs';
 import {ParentParams, TrayProxy} from '../models';
-import {IpcRenderer, WebFrame, Remote, BrowserWindowConstructorOptions, MenuItemConstructorOptions, BrowserWindow} from 'electron';
+import {IpcRenderer, WebFrame, Remote, BrowserWindowConstructorOptions, MenuItemConstructorOptions, BrowserWindow, app} from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as url from 'url';
@@ -101,7 +101,7 @@ export class NgxElectronService {
         const httpUrl = this.isServer() ? `http://${location.hostname}:${location.port}/#${routerUrl}` :
             `${url.format({
                 pathname: path.join(this.remote.app.getAppPath(),
-                    'dist', this.remote.app.name, 'index.html'),
+                    'dist', this.remote.app.getName(), 'index.html'),
                 protocol: 'file:',
                 slashes: true
             })}#${routerUrl}`;

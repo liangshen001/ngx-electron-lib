@@ -14,11 +14,11 @@ export function action(project, {store, skipInstall}) {
         .then(() => replaceContent(project, 'electron/electron-builder.json'))
         .then(() => replaceContent(project, 'electron/tsconfig.json'))
         .then(() => replaceContent(project, 'package.json', '"@ngx-electron/store": "lastest"',
-            `"@ngx-electron/store": "${packageJson['@ngx-electron/store']}"`))
+            `"@ngx-electron/store": "${packageJson.version}"`))
         .then(() => replaceContent(project, 'package.json', '"@ngx-electron/core": "lastest"',
-            `"@ngx-electron/core": "${packageJson['@ngx-electron/core']}"`))
+            `"@ngx-electron/core": "${packageJson.version}"`))
         .then(() => replaceContent(project, 'package.json', `"@ngx-electron/main": "lastest"`,
-            `"@ngx-electron/main": "${packageJson['@ngx-electron/main']}"`))
+            `"@ngx-electron/main": "${packageJson.version}"`))
         .then(() => replaceContent(project, 'package.json', '"@ngx-electron/cli": "lastest"',
             `"@ngx-electron/cli": "${packageJson.version}"`))
         .then(() => {

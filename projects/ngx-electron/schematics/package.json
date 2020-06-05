@@ -1,9 +1,26 @@
 {
   "name": "@ngx-electron/schematics",
-  "version": "8.8.16",
+  "version": "8.8.24",
   "peerDependencies": {
     "@angular/common": "^8.2.14",
     "@angular/core": "^8.2.14"
   },
+  "author": {
+    "name": "liangshen001",
+    "email": "wangliang520wl@hotmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/liangshen001/ngx-electron-lib/issues"
+  },
+  "homepage": "https://github.com/liangshen001/ngx-electron-lib/blob/master/projects/ngx-electron/schematics/README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liangshen001/ngx-electron-lib.git"
+  },
+  "keywords": [
+    "angular",
+    "electron"
+  ],
   "schematics": "./collection.json"
 }

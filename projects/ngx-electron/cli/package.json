@@ -1,6 +1,6 @@
 {
   "name": "@ngx-electron/cli",
-  "version": "8.8.16",
+  "version": "8.8.24",
   "main": "index.js",
   "dependencies": {
     "commander": "^4.0.1",
@@ -10,7 +10,17 @@
   "bin": {
     "ngx-electron": "./bin/ngx-electron.js"
   },
-  "@ngx-electron/core": "8.7.3",
-  "@ngx-electron/store": "8.7.2",
-  "@ngx-electron/main": "8.7.3"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/liangshen001/ngx-electron-lib/issues"
+  },
+  "homepage": "https://github.com/liangshen001/ngx-electron-lib/blob/master/projects/ngx-electron/cli/README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liangshen001/ngx-electron-lib.git"
+  },
+  "keywords": [
+    "angular",
+    "electron"
+  ]
 }
