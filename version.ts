@@ -2,10 +2,27 @@ const fs = require('fs');
 
 const json = readJson('./package.json');
 const version = json.version;
-const packagePath = process.argv[2] + '/package.json';
+const libName = process.argv[2];
+const packagePath = 'projects/' + libName + '/package.json';
+const readmeDistPath = 'dist/' + libName + '/README.md';
+
 const targetJson = readJson(packagePath);
 targetJson.version = version;
+targetJson.peerDependencies.electron = json.devDependencies.electron;
+targetJson.peerDependencies['@angular/cli'] = json.devDependencies['@angular/cli'];
+targetJson.peerDependencies['electron-builder'] = json.devDependencies['electron-builder'];
+targetJson.peerDependencies['electron-updater'] = json.dependencies['electron-updater'];
+targetJson.peerDependencies['electron-reload'] = json.dependencies['electron-reload'];
+targetJson.peerDependencies['@angular/core'] = json.dependencies['@angular/core'];
+targetJson.peerDependencies['@angular/common'] = json.dependencies['@angular/common'];
 writeJson(packagePath, targetJson);
+
+
+let readmeContent = fs.readFileSync(readmeDistPath).toString('utf-8');
+readmeContent = readmeContent.replace('angularCliVersion', json.devDependencies['@angular/cli']);
+fs.writeFileSync(readmeDistPath, readmeContent);
+
+
 
 function readJson(path: string) {
     const buffer = fs.readFileSync(path);

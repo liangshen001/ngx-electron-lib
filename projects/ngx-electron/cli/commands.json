@@ -1,6 +1,3 @@
 {
-    "new <project>": "./commands/new.json",
-    "local-start <project>": "./commands/local-start.json",
-    "server-start <project>": "./commands/server-start.json",
-    "build <project>": "./commands/build.json"
+    "new <project>": "./commands/new.json"
 }

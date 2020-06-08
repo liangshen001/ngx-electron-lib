@@ -5,9 +5,11 @@ import {flatMap, map} from 'rxjs/operators';
 import {getOptions, spawn} from '../utils';
 import {JsonObject} from '@angular-devkit/core';
 import {fromPromise} from 'rxjs/internal-compatibility';
+import * as path from 'path';
 
 interface ServerStartBuilderOptions extends JsonObject {
     devServerTarget: string;
+    electronRoot: string;
 }
 
 export default createBuilder<ServerStartBuilderOptions>(commandBuilder);
@@ -27,6 +29,9 @@ function commandBuilder(
                     target: 'electron-renderer'
                 })
             }).pipe(
+                flatMap(data => spawn(context, 'tsc', ['-p', path.join(process.cwd(), options.electronRoot)]).pipe(
+                    map(() => data)
+                )),
                 flatMap(data => spawn(context, 'electron', ['.', '--server', ...getOptions({
                     host: rawBrowserOptions.host,
                     port: rawBrowserOptions.port,

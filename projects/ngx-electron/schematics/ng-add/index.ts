@@ -42,84 +42,14 @@ app.on('activate', () => {
     }
 });`;
 
-const electronBuilderJsonContent = (name: string) => '{\n' +
-    '    "appId": "appId",\n' +
-    '    "productName": "' + name + '",\n' +
-    '    "copyright": "Copyright©2020",\n' +
-    '    "compression": "maximum",\n' +
-    '    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",\n' +
-    '    "directories": {\n' +
-    '        "output": "dist/electron/"\n' +
-    '    },\n' +
-    '    "files": [\n' +
-    '        "dist/${productName}/*",\n' +
-    '        "dist/electron/*"\n' +
-    '    ],\n' +
-    '    "dmg": {\n' +
-    '        "backgroundColor": "#FFFFFF",\n' +
-    '        "contents": [\n' +
-    '            {\n' +
-    '                "x": 130,\n' +
-    '                "y": 220\n' +
-    '            },\n' +
-    '            {\n' +
-    '                "x": 410,\n' +
-    '                "y": 220,\n' +
-    '                "type": "link",\n' +
-    '                "path": "/Applications"\n' +
-    '            }\n' +
-    '        ],\n' +
-    '        "title": "TiEthWallet ${version}"\n' +
-    '    },\n' +
-    '    "win": {\n' +
-    '        "target": [\n' +
-    '            "nsis"\n' +
-    '        ]\n' +
-    '    },\n' +
-    '    "mac": {\n' +
-    '        "category": "public.app-category.utilities",\n' +
-    '        "target": [\n' +
-    '            "dmg"\n' +
-    '        ]\n' +
-    '    },\n' +
-    '    "linux": {\n' +
-    '        "category": "Utility",\n' +
-    '        "synopsis": "TiEthWallet",\n' +
-    '        "description": "TiEthWallet",\n' +
-    '        "target": [\n' +
-    '            "AppImage",\n' +
-    '            "deb"\n' +
-    '        ]\n' +
-    '    },\n' +
-    '    "nsis": {\n' +
-    '        "oneClick": false,\n' +
-    '        "perMachine": true,\n' +
-    '        "allowToChangeInstallationDirectory": true,\n' +
-    '        "installerIcon": "src/favicon.ico",\n' +
-    '        "uninstallerIcon": "src/favicon.ico",\n' +
-    '        "artifactName": "${productName}-${version}-${os}-${arch}-setup.${ext}",\n' +
-    '        "deleteAppDataOnUninstall": true\n' +
-    '    }\n' +
-    '}\n';
-
-const tsconfigJsonContent = `{
-    "extends": "../tsconfig.json",
-    "compilerOptions": {
-        "outDir": "../dist/electron",
-        "target": "es2015",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "resolveJsonModule": true
-    },
-    "files": [
-        "main.ts"
-    ]
+interface NgAddOptions {
+    store: boolean;
+    skipInstall: boolean;
 }
-`;
 
 
 // Just return the tree
-export function ngAdd(): Rule {
+export function ngAdd(options: NgAddOptions): Rule {
     return (tree: Tree, context: SchematicContext) => {
         if (!tree.exists('angular.json') || !tree.exists('package.json') || !tree.exists('tsconfig.json')) {
             context.logger.error('This is not an angular cli application');
@@ -128,16 +58,13 @@ export function ngAdd(): Rule {
 
         const angularText = tree.get('angular.json')!.content.toString('utf-8');
         const angularJson = JSON.parse(angularText);
+        const configurations = angularJson.projects[angularJson.defaultProject].architect.build.configurations;
 
-        if (!tree.exists('/electron/main.ts')) {
-            tree.create('/electron/main.ts', mainTsContent(angularJson.defaultProject));
-        }
-        if (!tree.exists('/electron/electron-builder.json')) {
-            tree.create('/electron/electron-builder.json', electronBuilderJsonContent(angularJson.defaultProject));
-        }
-        if (!tree.exists('/electron/tsconfig.json')) {
-            tree.create('/electron/tsconfig.json', tsconfigJsonContent);
-        }
+        createElectronMainTs(tree);
+
+        createELectronELectronBuilderJson(tree);
+
+        createELectronTsconfigJson(tree);
 
 
         addToPackageJson(tree, 'electron-server-start',
@@ -145,11 +72,23 @@ export function ngAdd(): Rule {
         addToPackageJson(tree, 'electron-local-start',
             'ng run ' + angularJson.defaultProject + ':electron-local-start', 'scripts');
         addToPackageJson(tree, 'electron-build:win',
-            'ng run ' + angularJson.defaultProject + ':electron-build --win=true', 'scripts');
+            'ng run ' + angularJson.defaultProject + ':electron-build --win', 'scripts');
         addToPackageJson(tree, 'electron-build:mac',
-            'ng run ' + angularJson.defaultProject + ':electron-build --mac=true', 'scripts');
+            'ng run ' + angularJson.defaultProject + ':electron-build --mac', 'scripts');
         addToPackageJson(tree, 'electron-build:linux',
-            'ng run ' + angularJson.defaultProject + ':electron-build --linux=true', 'scripts');
+            'ng run ' + angularJson.defaultProject + ':electron-build --linux', 'scripts');
+        Object.keys(configurations).forEach(key => {
+            addToPackageJson(tree, 'electron-server-start:' + key,
+                'ng run ' + angularJson.defaultProject + ':electron-server-start:' + key, 'scripts');
+            addToPackageJson(tree, 'electron-local-start:' + key,
+                'ng run ' + angularJson.defaultProject + ':electron-local-start:' + key, 'scripts');
+            addToPackageJson(tree, 'electron-build:win:' + key,
+                'ng run ' + angularJson.defaultProject + ':electron-build:' + key + ' --win=true', 'scripts');
+            addToPackageJson(tree, 'electron-build:mac:' + key,
+                'ng run ' + angularJson.defaultProject + ':electron-build:' + key + ' --mac=true', 'scripts');
+            addToPackageJson(tree, 'electron-build:linux:' + key,
+                'ng run ' + angularJson.defaultProject + ':electron-build:' + key + ' --linux=true', 'scripts');
+        });
 
 
         addToPackageJson(tree, '@ngx-electron/main', ngxElectronVersion, 'dependencies');
@@ -159,15 +98,121 @@ export function ngAdd(): Rule {
         addToPackageJson(tree, 'electron-builder', '^22.7.0', 'devDependencies');
         addToPackageJson(tree, 'electron-reload', '~1.5.0', 'dependencies');
         addToPackageJson(tree, 'electron', '~7.1.7', 'devDependencies');
+        if (options.store) {
+            addToPackageJson(tree, '@ngx-electron/store', ngxElectronVersion, 'devDependencies');
+        }
 
         const sourceText = tree.read('package.json')!.toString('utf-8');
         const json = JSON.parse(sourceText);
         json.main = 'dist/electron/main.js';
-        tree.overwrite('package.json', JSON.stringify(json, null, 4));
+        tree.overwrite('package.json', JSON.stringify(json, null, 2));
         addArchitectToAngularJson(tree);
-        context.addTask(new NodePackageInstallTask());
+        if (!options.skipInstall) {
+            context.addTask(new NodePackageInstallTask());
+        }
         return tree;
     };
+}
+
+function createElectronMainTs(tree: Tree) {
+    const angularText = tree.get('angular.json')!.content.toString('utf-8');
+    const angularJson = JSON.parse(angularText);
+    if (!tree.exists('/electron/main.ts')) {
+        tree.create('/electron/main.ts', mainTsContent(angularJson.defaultProject));
+    }
+}
+
+function createELectronTsconfigJson(tree: Tree) {
+
+    if (!tree.exists('/electron/tsconfig.json')) {
+        const json = {
+            extends: '../tsconfig.json',
+            compilerOptions: {
+                outDir: '../dist/electron',
+                target: 'es2015',
+                module: 'commonjs',
+                moduleResolution: 'node',
+                resolveJsonModule: true
+            },
+            files: [
+                'main.ts'
+            ]
+        };
+
+
+        tree.create('/electron/tsconfig.json', JSON.stringify(json, null, 2));
+    }
+
+}
+
+function createELectronELectronBuilderJson(tree: Tree) {
+    const angularText = tree.get('angular.json')!.content.toString('utf-8');
+    const angularJson = JSON.parse(angularText);
+
+    const json = {
+        appId: 'appId',
+        productName: angularJson.defaultProject,
+        copyright: 'Copyright©2020',
+        compression: 'maximum',
+        artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
+        directories: {
+            output: 'dist/electron/'
+        },
+        files: [
+            'dist/${productName}/*',
+            'dist/electron/*'
+        ],
+        dmg: {
+            backgroundColor: '#FFFFFF',
+            contents: [
+                {
+                    x: 130,
+                    y: 220
+                },
+                {
+                    x: 410,
+                    y: 220,
+                    type: 'link',
+                    path: '/Applications'
+                }
+            ],
+            title: 'TiEthWallet ${version}'
+        },
+        win: {
+            target: [
+                'nsis'
+            ]
+        },
+        mac: {
+            category: 'public.app-category.utilities',
+            target: [
+                'dmg'
+            ]
+        },
+        linux: {
+            category: 'Utility',
+            synopsis: 'TiEthWallet',
+            description: 'TiEthWallet',
+            target: [
+                'AppImage',
+                'deb'
+            ]
+        },
+        nsis: {
+            oneClick: false,
+            perMachine: true,
+            allowToChangeInstallationDirectory: true,
+            installerIcon: 'src/favicon.ico',
+            uninstallerIcon: 'src/favicon.ico',
+            artifactName: '${productName}-${version}-${os}-${arch}-setup.${ext}',
+            deleteAppDataOnUninstall: true
+        }
+    };
+
+
+    if (!tree.exists('/electron/electron-builder.json')) {
+        tree.create('/electron/electron-builder.json', JSON.stringify(json, null, 2));
+    }
 }
 
 function addArchitectToAngularJson(tree: Tree) {
@@ -195,6 +240,7 @@ function addArchitectToAngularJson(tree: Tree) {
     architect['electron-server-start'] = {
         builder: '@ngx-electron/builder:server-start',
         options: {
+            electronRoot: 'electron',
             devServerTarget
         },
         configurations: getConfigurations('devServerTarget', devServerTarget)
@@ -207,7 +253,7 @@ function addArchitectToAngularJson(tree: Tree) {
         },
         configurations: getConfigurations('browserTarget', browserTarget)
     };
-    tree.overwrite('angular.json', JSON.stringify(angularJson, null, 4));
+    tree.overwrite('angular.json', JSON.stringify(angularJson, null, 2));
 }
 
 
@@ -247,6 +293,6 @@ export function addToPackageJson(
         json[type] = sortObjectByKeys(json[type]);
     }
 
-    host.overwrite('package.json', JSON.stringify(json, null, 4));
+    host.overwrite('package.json', JSON.stringify(json, null, 2));
     return host;
 }

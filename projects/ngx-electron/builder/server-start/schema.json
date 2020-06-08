@@ -8,6 +8,10 @@
             "type": "string",
             "description": "Target to serve.",
             "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+        },
+        "electronRoot": {
+            "type": "string",
+            "description": "electronRoot."
         }
     },
     "additionalProperties": false,
