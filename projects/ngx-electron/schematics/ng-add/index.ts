@@ -14,7 +14,10 @@ function init() {
     win = createWindow('', {
         width: 1024,
         height: 768,
-        title: '${name}'
+        title: '${name}',
+        webPreferences: {
+            nodeIntegration: true
+        }
     });
     win.on('close', () => app.quit());
 }

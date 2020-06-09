@@ -12,7 +12,10 @@ function init() {
     }, {
         width: 1024,
         height: 768,
-        title: 'ngx-electron-lib'
+        title: 'ngx-electron-lib',
+        webPreferences: {
+            nodeIntegration: true
+        }
     });
     win.on('close', () => app.quit());
 }

@@ -40,7 +40,10 @@ export class Page1IndexComponent implements OnInit {
         this.electronService.openPage('page2', {
             width: 1024,
             height: 768,
-            title: 'ngx-electron-lib2'
+            title: 'ngx-electron-lib2',
+            webPreferences: {
+                nodeIntegration: true
+            }
         }, {
             initData: this.title
         });
@@ -54,7 +57,10 @@ export class Page1IndexComponent implements OnInit {
         // 打开页面并把所有的user数据传输过去
         this.electronDataService.openPage('page3', {
             width: 1024,
-            height: 768
+            height: 768,
+            webPreferences: {
+                nodeIntegration: true
+            }
         }, {
             actions: [
                 this.store$.pipe(
