@@ -30,6 +30,12 @@
       ],
       "@ngx-electron/store/*": [
         "dist/ngx-electron/store/*"
+      ],
+      "@ngx-electron/redux": [
+        "dist/ngx-electron/redux"
+      ],
+      "@ngx-electron/redux/*": [
+        "dist/ngx-electron/redux/*"
       ]
     }
   },

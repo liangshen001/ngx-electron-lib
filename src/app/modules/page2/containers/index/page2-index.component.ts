@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
-import {NgxElectronService} from '@ngx-electron/core';
+import {ElectronService} from '@ngx-electron/core';
 
 @Component({
     selector: 'app-page2',
@@ -13,7 +13,7 @@ export class Page2IndexComponent implements OnInit {
 
     data$: Observable<string>;
 
-    constructor(private electronService: NgxElectronService) {}
+    constructor(private electronService: ElectronService) {}
 
     ngOnInit(): void {
         this.initData = this.electronService.initData;

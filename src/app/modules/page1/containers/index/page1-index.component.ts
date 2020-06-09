@@ -3,7 +3,7 @@ import {select, Store} from '@ngrx/store';
 import {map, take} from 'rxjs/operators';
 import {UserReducerState, getAllUsers} from '../../../../reducers/user.reducer';
 import {LoadUserList, LoadUserListSuccess} from '../../../../actions/user.action';
-import {NgxElectronService} from '@ngx-electron/core';
+import {ElectronService} from '@ngx-electron/core';
 import {NgxElectronStoreService} from '@ngx-electron/store';
 
 @Component({
@@ -17,7 +17,7 @@ export class Page1IndexComponent implements OnInit {
         this.store$.dispatch(new LoadUserList());
     }
 
-    constructor(private electronService: NgxElectronService,
+    constructor(private electronService: ElectronService,
                 private store$: Store<UserReducerState>,
                 private electronDataService: NgxElectronStoreService) {
     }
@@ -47,7 +47,7 @@ export class Page1IndexComponent implements OnInit {
     }
 
     sendData() {
-        this.electronService.send('page1 data', 'page2');
+        this.electronService.sendDataToWindowsByKeys('page1 data', ['page2']);
     }
 
     openPage3() {

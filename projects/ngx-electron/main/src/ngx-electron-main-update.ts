@@ -21,7 +21,6 @@ function initUpdateListener() {
      */
     ipcMain.on('ngx-electron-download-update', e => {
         autoUpdater.downloadUpdate();
-
         // 更新下载进度事件
         autoUpdater.on('download-progress', progressObj =>
             e.sender.send('ngx-electron-download-progress', progressObj));

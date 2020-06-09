@@ -1,25 +1,23 @@
 import {ModuleWithProviders, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {NgxElectronContentMenuDirective} from './directives/ngx-electron-content-menu.directive';
-import {NgxElectronWindowComponent} from './components/ngx-electron-window/ngx-electron-window.component';
-import {NgxElectronService} from './services/ngx-electron.service';
+import {NgxElectronContentMenusDirective} from './directives/ngx-electron-content-menus.directive';
+import {ElectronService} from './electron.service';
 import {NgxElectronDragDirective} from './directives/ngx-electron-drag.directive';
+import {RendererInterface} from 'electron';
 
 
 
 @NgModule({
   declarations: [
-    NgxElectronContentMenuDirective,
-    NgxElectronDragDirective,
-    NgxElectronWindowComponent
+    NgxElectronContentMenusDirective,
+    NgxElectronDragDirective
   ],
   imports: [
     CommonModule
   ],
   exports: [
-    NgxElectronContentMenuDirective,
-    NgxElectronDragDirective,
-    NgxElectronWindowComponent
+    NgxElectronContentMenusDirective,
+    NgxElectronDragDirective
   ]
 })
 export class CoreModule {

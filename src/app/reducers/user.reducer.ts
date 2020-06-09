@@ -43,7 +43,7 @@ export const getUserState = createFeatureSelector<UserReducerState>('user');
 
 
 export const {
-    selectIds: getUserIdss,
+    selectIds: getUserIds,
     selectEntities: getUserEntities,
     selectAll: getAllUsers,
     selectTotal: getTotalUsers,

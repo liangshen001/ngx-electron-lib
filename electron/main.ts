@@ -6,7 +6,10 @@ initElectronMainIpcListener();
 
 function init() {
     // createTray('icon/logo.png');
-    win = createWindow('', {
+    win = createWindow({
+        path: '',
+        key: ''
+    }, {
         width: 1024,
         height: 768,
         title: 'ngx-electron-lib'

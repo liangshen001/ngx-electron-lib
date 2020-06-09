@@ -21,7 +21,7 @@ function getArgValue(args: string[], name: string): string | boolean {
 function initArgs() {
     const args = process.argv.splice(2);
     console.log(`初始化ngx-electron-main, 启动参数：${JSON.stringify(args)}`);
-    isServer = args.includes('--server')
+    isServer = args.includes('--server');
     if (isServer) {
         console.log('加载服务的方式运行');
         port = getArgValue(args, '--port') || 8080;

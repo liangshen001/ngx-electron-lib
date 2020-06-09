@@ -3,7 +3,7 @@ import {Action, Store} from '@ngrx/store';
 import {Router} from '@angular/router';
 import {concat, Observable} from 'rxjs';
 import {BrowserWindow, BrowserWindowConstructorOptions} from 'electron';
-import {NgxElectronService, ParentParams} from '@ngx-electron/core';
+import {ElectronService, ParentParams} from '@ngx-electron/core';
 
 @Injectable({
     providedIn: 'root'
@@ -12,12 +12,12 @@ export class StoreService {
   constructor(private store$: Store<any>,
               private ngZone: NgZone,
               private router: Router,
-              private electronService: NgxElectronService) {
-    if (this.electronService.isElectron()) {
-      const winId = this.electronService.remote.getCurrentWindow().id;
-      this.electronService.ipcRenderer.on(`ngx-electron-action-shared-${winId}`,
+              private electronService: ElectronService) {
+    if (this.electronService.isElectron) {
+      const winId = this.electronService.electron.remote.getCurrentWindow().id;
+      this.electronService.electron.ipcRenderer.on(`ngx-electron-action-shared-${winId}`,
         (event, action) => this.ngZone.run(() => this.store$.dispatch(action)));
-      this.electronService.ipcRenderer.send(`ngx-electron-win-init-${winId}`);
+      this.electronService.electron.ipcRenderer.send(`ngx-electron-win-init-${winId}`);
     }
   }
 
@@ -31,7 +31,7 @@ export class StoreService {
   dispatch(action: Action, ...keys: string[]);
 
   dispatch(action: Action, ...idKeys: any[]) {
-    if (this.electronService.isElectron()) {
+    if (this.electronService.isElectron) {
       if (idKeys && idKeys.length) {
         idKeys.filter(idKey => idKey)
           .map(idKey => {
@@ -46,11 +46,11 @@ export class StoreService {
             }
           })
           .filter(id => id)
-          .map(id => this.electronService.remote.BrowserWindow.fromId(id))
+          .map(id => this.electronService.electron.remote.BrowserWindow.fromId(id))
           .filter(win => win)
           .forEach(win => win.webContents.send(`ngx-electron-action-shared-${win.id}`, action));
       } else {
-        this.electronService.remote.BrowserWindow.getAllWindows()
+        this.electronService.electron.remote.BrowserWindow.getAllWindows()
           .forEach(win => win.webContents.send(`ngx-electron-action-shared-${win.id}`, action));
       }
     } else {
@@ -76,12 +76,12 @@ export class StoreService {
     key: routerUrl,
     webHandler: () => this.router.navigateByUrl(routerUrl)
   }): BrowserWindow {
-    if (this.electronService.isElectron()) {
+    if (this.electronService.isElectron) {
       if (this.electronService.isLoadElectronMain) {
         const winId = this.electronService.getWinIdByKey(key);
         console.log(`获得窗口${key}的窗口ID:${winId}`);
         if (winId) {
-          const win = this.electronService.remote.BrowserWindow.fromId(winId);
+          const win = this.electronService.electron.remote.BrowserWindow.fromId(winId);
           win.focus();
           return win;
         }
@@ -92,7 +92,7 @@ export class StoreService {
           parentWinId = this.electronService.getWinIdByKey(parent.winKey);
         }
         if (parentWinId) {
-          options.parent = this.electronService.remote.BrowserWindow.fromId(parentWinId);
+          options.parent = this.electronService.electron.remote.BrowserWindow.fromId(parentWinId);
         }
       }
       const win2 = this.electronService.createWindow(routerUrl, key, options);
@@ -100,7 +100,7 @@ export class StoreService {
         created(win2);
       }
       console.log(`创建窗口成功`);
-      this.electronService.remote.ipcMain.on(`ngx-electron-win-init-${win2.id}`, event =>
+      this.electronService.electron.remote.ipcMain.on(`ngx-electron-win-init-${win2.id}`, event =>
         actions && concat(...actions).subscribe(action =>
           win2.webContents.send(`ngx-electron-action-shared-${win2.id}`, action),
         () => {},

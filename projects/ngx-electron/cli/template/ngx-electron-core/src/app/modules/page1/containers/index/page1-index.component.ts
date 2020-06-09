@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {NgxElectronService} from '@ngx-electron/core';
+import {ElectronService} from '@ngx-electron/core';
 
 @Component({
     selector: 'app-page1',
@@ -8,7 +8,7 @@ import {NgxElectronService} from '@ngx-electron/core';
 export class Page1IndexComponent {
     title = 'page1';
 
-    constructor(private electronService: NgxElectronService) {}
+    constructor(private electronService: ElectronService) {}
 
     openPage2() {
         this.electronService.openPage('page2', {
