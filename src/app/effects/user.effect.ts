@@ -1,16 +1,17 @@
 import {Injectable} from '@angular/core';
 import {Actions, Effect, ofType} from '@ngrx/effects';
-import {map, switchMap} from 'rxjs/operators';
-import {LoadUserList, LoadUserListSuccess, UserActionTypes} from '../actions/user.action';
+import {exhaustMap, map} from 'rxjs/operators';
+import {loadUserList, loadUserListSuccess} from '../actions/user.action';
 import {of} from 'rxjs';
 
 @Injectable()
 export class UserEffect {
 
+
     @Effect()
     loadUserList$ = this.actions$.pipe(
-        ofType<LoadUserList>(UserActionTypes.LOAD_USER_LIST),
-        switchMap(() => of([{
+        ofType(loadUserList),
+        exhaustMap(() => of([{
             id: 0,
             name: 'liangshen',
             sort: 1
@@ -19,7 +20,7 @@ export class UserEffect {
             name: 'liangshen2',
             sort: 2
         }])),
-        map(users => new LoadUserListSuccess(users))
+        map(users => loadUserListSuccess({users}))
     );
 
 

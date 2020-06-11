@@ -4,13 +4,13 @@ import {replaceContent, spawn} from '../bin/util';
 const fse = require('fs-extra');
 const packageJson = require('../package');
 
-export function action(project, {store, skipInstall}) {
+export function action(project, {redux, skipInstall}) {
     fse.ensureDirSync(path.join(process.cwd(), project));
 
 
     spawn('npm', ['i', '@angular/cli@' + packageJson.peerDependencies['@angular/cli'], '-g'])
         .then(() => spawn('ng', ['new', project]))
-        .then(() => spawn('ng', ['add', '@ngx-electron/schematics', ...store ? ['--store'] : [], ...skipInstall ? ['--skipInstall'] : []], {
+        .then(() => spawn('ng', ['add', '@ngx-electron/schematics', ...redux ? ['--redux'] : [], ...skipInstall ? ['--skipInstall'] : []], {
             cwd: project
         }));
     // console.log('应用下载完成');

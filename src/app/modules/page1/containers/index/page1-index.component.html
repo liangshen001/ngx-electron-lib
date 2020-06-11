@@ -11,7 +11,7 @@
     <ul>
       <li>
         <h2><a rel="noopener" href="javascript:void(0);" (click)="openPage2()">open page2</a></h2>
-        <h2><a rel="noopener" href="javascript:void(0);" (click)="sendData()">send data to page2</a></h2>
+        <h2 *ngIf="page2Win"><a rel="noopener" href="javascript:void(0);" (click)="sendData()">send data to page2</a></h2>
       </li>
       <li>
         <h2><a rel="noopener" href="javascript:void(0);" (click)="openPage3()">open page3</a></h2>

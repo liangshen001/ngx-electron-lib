@@ -96,8 +96,3 @@ export interface Point {
     x: number;
     y: number;
 }
-
-export interface ParentParams {
-    winId?: number;
-    winKey?: string;
-}

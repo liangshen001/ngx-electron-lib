@@ -8,8 +8,7 @@ function init() {
     // createTray('icon/logo.png');
     win = createWindow({
         path: '',
-        key: ''
-    }, {
+        key: '',
         width: 1024,
         height: 768,
         title: 'ngx-electron-lib',

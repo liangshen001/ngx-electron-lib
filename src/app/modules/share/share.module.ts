@@ -3,13 +3,13 @@ import {CommonModule} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {components} from './components';
 import {NgxElectronCoreModule} from '@ngx-electron/core';
-import {NgxElectronStoreModule} from '@ngx-electron/store';
+import {NgxElectronReduxModule} from '@ngx-electron/redux';
 
 @NgModule({
     imports: [
         CommonModule,
         NgxElectronCoreModule,
-        NgxElectronStoreModule,
+        NgxElectronReduxModule,
         FormsModule
     ],
     declarations: [
@@ -19,7 +19,7 @@ import {NgxElectronStoreModule} from '@ngx-electron/store';
     exports: [
         CommonModule,
         NgxElectronCoreModule,
-        NgxElectronStoreModule,
+        NgxElectronReduxModule,
         FormsModule,
         ...components
     ]

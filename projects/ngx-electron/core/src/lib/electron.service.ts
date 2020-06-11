@@ -1,30 +1,34 @@
 import {Injectable, NgZone} from '@angular/core';
 import {Router} from '@angular/router';
-import {Observable} from 'rxjs';
-import {ParentParams, TrayProxy} from './models';
-import {BrowserWindow, BrowserWindowConstructorOptions, MenuItemConstructorOptions, RendererInterface} from 'electron';
+import {concat, Observable} from 'rxjs';
+import {TrayProxy} from './models';
+import {
+    BrowserWindow,
+    BrowserWindowConstructorOptions,
+    MenuItemConstructorOptions,
+    RendererInterface,
+    IpcMainEvent,
+    IpcRendererEvent
+} from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as path from 'path';
 
-
-// If you import a module but never use any of the imported values other than as TypeScript types,
-// the resulting javascript file will look as if you never imported the module at all.
+export type BrowserWindowOptions =
+    BrowserWindowConstructorOptions
+    & { path: string, key?: string, parentKey?: string, parentId?: number, callback?: (event: IpcMainEvent) => void };
 
 @Injectable({
     providedIn: 'root'
 })
 export class ElectronService {
+    openerWindowId?: number;
 
     electron?: RendererInterface;
 
     childProcess?: typeof childProcess;
     fs?: typeof fs;
-    // 初始化得到的数据
-    initData: any;
-
-    isLoadElectronMain: boolean;
 
     private _tray: TrayProxy;
 
@@ -92,7 +96,6 @@ export class ElectronService {
 
     constructor(private router: Router,
                 private ngZone: NgZone) {
-        // Conditional imports
         if (!this.isElectron) {
             return;
         }
@@ -103,130 +106,108 @@ export class ElectronService {
         if (!this.electron.remote.ipcMain.listenerCount('ngx-electron-load-electron-main')) {
             throw new Error('@ngx-electron/main is not imported in electron main');
         }
-        this.electron.ipcRenderer.on('ngx-electron-core-init-data', (event, initData) => this.initData = initData);
-    }
-
-    createWindow(routerUrl: string, key: string, options: BrowserWindowConstructorOptions) {
-        let win = new this.electron.remote.BrowserWindow({
-            show: false,
-            ...options
-        });
-        const httpUrl = this.isServer ? `http://${location.hostname}:${location.port}/#${routerUrl}` :
-            `${url.format({
-                pathname: path.join(this.electron.remote.app.getAppPath(),
-                    'dist', this.electron.remote.app.getName(), 'index.html'),
-                protocol: 'file:',
-                slashes: true
-            })}#${routerUrl}`;
-        console.log(`加载url:${httpUrl}`);
-        win.loadURL(httpUrl);
-        if (this.isOpenDevTools) {
-            win.webContents.openDevTools();
+        const winId = this.electron.remote.getCurrentWindow().id;
+        if (this.electron.remote.ipcMain.listenerCount(`ngx-electron-renderer-win-initialized-${winId}`)) {
+            this.openerWindowId = +this.electron.ipcRenderer.sendSync(`ngx-electron-renderer-win-initialized-${winId}`);
         }
-        this.electron.ipcRenderer.send('ngx-electron-win-created', key, win.id);
-        win.once('closed', () => {
-            this.electron.ipcRenderer.send('ngx-electron-win-destroyed', key);
-            win = null;
-        });
-        win.once('ready-to-show', () => win.show());
-        return win;
     }
 
-    sendDataToWindowsByKeys(data: any, keys: string[]) {
+    sendDataToWindowsByKeys<T>(data: T, ...keys: string[]) {
         if (this.isElectron) {
-            const ids = keys.map(key => this.isLoadElectronMain && this.getWinIdByKey(key));
-            this.sendDataToWindowsByIds(data, ids);
+            const ids = keys.map(key => this.getWinIdByKey(key));
+            this.sendDataToWindowsByIds<T>(data, ...ids);
         }
     }
 
-    sendDataToWindowsByIds(data: any, ids: number[]) {
+    sendDataToWindowsByIds<T>(data: T, ...ids: number[]) {
         if (this.isElectron) {
-            ids.map(id => this.electron.remote.BrowserWindow.fromId(id))
-                .filter(win => !!win)
-                .forEach(win => win.webContents.send('ngx-electron-core-data', data));
+            const wins = ids.map(id => this.electron.remote.BrowserWindow.fromId(id));
+            this.sendDataToWindows<T>(data, ...wins);
         }
     }
 
-    sendDataToAllWindows(data: any) {
-        this.electron.remote.BrowserWindow.getAllWindows()
-            .forEach(win => win.webContents.send('ngx-electron-core-data', data));
+    sendDataToAllWindows<T>(data: T) {
+        if (this.isElectron) {
+            const wins = this.electron.remote.BrowserWindow.getAllWindows();
+            this.sendDataToWindows<T>(data, ...wins);
+        }
     }
 
-    /**
-     * electron：新找开一个window加载routerUrl路由页面，web下 若webHandler参数为空，在此页面加载这个路由，若不空为无影响
-     * web:加载这个路由
-     * @param routerUrl 所加载的页面（electron/web）
-     * @param options 加载electron window的参数 web下无影响
-     * @param key 打开窗口的key 不可创建key值相同的窗口 默认和routerUrl相等 也就是说同样的路由只允许打开一次
-     *              (在主进程中初始化ngx-electron-core-main此属性才有效)
-     *              web下无影响
-     * @param initData electron下window在被打开时初始化的数据 在新打开的窗口中使用ElectronService.initData获取
-     *              数据会被json序列化，对象的方法和原型会被去除
-     *              web下无影响
-     * @param webHandler electron下无影响 web下的回调函数（默认行为加载routerUrl路由）
-     * @param created win被创建
-     * @param parentWinKey 父窗口key
-     * @param parentWinId 父窗窗口id
-     * @return 在electron下会返回 winId 在web下会返回 null
-     */
-    openPage(routerUrl: string, options: BrowserWindowConstructorOptions = {}, {
-        key = routerUrl,
-        initData,
-        webHandler = () => this.router.navigateByUrl(routerUrl),
-        created = () => {
-        },
-        parent
-    }: {
-        key?: string,
-        initData?: any,
-        webHandler?: () => void,
-        created?: (win: BrowserWindow) => void,
-        parent?: ParentParams
-    } = {
-        key: routerUrl,
-        webHandler: () => this.router.navigateByUrl(routerUrl)
-    }): BrowserWindow {
+    sendDataToWindows<T>(data: T, ...wins: BrowserWindow[]) {
+        if (this.isElectron) {
+            wins.filter(win => !!win).forEach(win => win.webContents.send('ngx-electron-renderer-core-data', data));
+        }
+    }
+
+    sendDataToOpenerWindow<T>(data: T) {
+        if (this.isElectron && this.openerWindowId) {
+            this.sendDataToWindowsByIds(data, this.openerWindowId);
+        }
+    }
+
+    createWindow(options: BrowserWindowOptions): BrowserWindow | null {
         if (this.isElectron) {
             // 判断主进程是否加载所需文件
-            if (this.isLoadElectronMain) {
-                const winId = this.getWinIdByKey(key);
-                if (winId) {
-                    const win = this.electron.remote.BrowserWindow.fromId(winId);
-                    win.focus();
-                    return win;
-                }
-            }
-            if (parent) {
-                let parentWinId;
-                if (!parent.winId) {
-                    parentWinId = this.getWinIdByKey(parent.winKey);
+            const winId = this.getWinIdByKey(options.key);
+            let win: BrowserWindow;
+            if (winId) {
+                win = this.electron.remote.BrowserWindow.fromId(winId);
+                win.focus();
+            } else {
+                let parentWinId = options.parentId;
+                if (parentWinId === undefined && options.parentKey) {
+                    parentWinId = this.getWinIdByKey(options.parentKey);
                 }
                 if (parentWinId) {
                     options.parent = this.electron.remote.BrowserWindow.fromId(parentWinId);
                 }
+                win = new this.electron.remote.BrowserWindow({
+                    show: false,
+                    ...options
+                });
+                const httpUrl = this.isServer ? `http://${location.hostname}:${location.port}/#${options.path}` :
+                    `${url.format({
+                        pathname: path.join(this.electron.remote.app.getAppPath(),
+                            'dist', this.electron.remote.app.getName(), 'index.html'),
+                        protocol: 'file:',
+                        slashes: true
+                    })}#${options.path}`;
+                console.log(`load url:${httpUrl}`);
+                win.loadURL(httpUrl);
+                if (this.isOpenDevTools) {
+                    win.webContents.openDevTools();
+                }
+                if (options.key) {
+                    this.electron.ipcRenderer.send('ngx-electron-renderer-win-created', options.key, win.id);
+                }
+                win.once('closed', () => {
+                    if (options.key) {
+                        this.electron.ipcRenderer.send('ngx-electron-renderer-win-destroyed', options.key);
+                    }
+                    win = null;
+                });
+                win.once('ready-to-show', () => win.show());
+                this.electron.remote.ipcMain.on(`ngx-electron-renderer-win-initialized-${win.id}`, event => {
+                    event.returnValue = this.electron.remote.getCurrentWindow().id;
+                    if (options.callback) {
+                        options.callback(event);
+                    }
+                });
             }
-            const win2 = this.createWindow(routerUrl, key, options);
-            if (created) {
-                created(win2);
-            }
-            win2.once('ready-to-show', () =>
-                win2.webContents.send('ngx-electron-core-init-data', initData));
-            return win2;
-        } else {
-            webHandler();
-            return null;
+            return win;
         }
+        return null;
     }
 
     /**
-     * 获得其他窗口发送的数据 注意：数据在发送过程中json序列化 会去掉方法和原型
-     * @return 数据
+     * 获得其他窗口发送据 注意：数据在的数发送过程中json序列化 会去掉方法和原型
+     * @return Observable
      */
-    data(): Observable<any> {
-        return new Observable(observer => {
+    data<T>(): Observable<{ event: IpcRendererEvent, data?: T }> {
+        return new Observable<{ event: IpcRendererEvent, data?: T }>(observer => {
             if (this.isElectron) {
-                this.electron.ipcRenderer.on('ngx-electron-core-data',
-                    (event, data) => this.ngZone.run(() => setTimeout(() => observer.next(data))));
+                this.electron.ipcRenderer.on('ngx-electron-renderer-core-data',
+                    (event, data) => this.ngZone.run(() => setTimeout(() => observer.next({event, data}))));
             }
         });
     }
@@ -239,8 +220,8 @@ export class ElectronService {
      * @param key key
      * @return 如果返回null说明 没有此key的窗口
      */
-    getWinIdByKey(key: string): number | null {
-        return this.electron.ipcRenderer.sendSync('ngx-electron-get-win-id-by-key', key);
+    getWinIdByKey(key: string): number {
+        return this.isElectron && this.electron.ipcRenderer.sendSync('ngx-electron-renderer-get-win-id-by-key', key);
     }
 
 
@@ -249,41 +230,49 @@ export class ElectronService {
      * @param template 1
      */
     setTrayContextMenu(template: MenuItemConstructorOptions[]) {
-        const timestamp = new Date().getTime();
-        this.electron.ipcRenderer.on(`ngx-electron-click-tray-context-menu-item-${timestamp}`, (event, i) => {
-            const item = template.find((value, index) => index === i);
-            this.ngZone.run(() => setTimeout(() =>
-                item.click && item.click(null, null, null)));
-        });
-        // template.forEach(
-        //     (currentValue, index) => this.ipcRenderer.on(`ngx-electron-click-tray-context-menu-item-${index}-${timestamp}`,
-        //         () => this.ngZone.run(() => setTimeout(() => {
-        //             debugger;
-        //             currentValue.click && currentValue.click();
-        //         }))));
-        this.electron.ipcRenderer.send('ngx-electron-set-tray-context-menu', template, timestamp);
+        if (this.isElectron) {
+            const timestamp = new Date().getTime();
+            this.electron.ipcRenderer.on(`ngx-electron-click-tray-context-menu-item-${timestamp}`, (event, i) => {
+                const item = template.find((value, index) => index === i);
+                this.ngZone.run(() => setTimeout(() =>
+                    item.click && item.click(null, null, null)));
+            });
+            // template.forEach(
+            //     (currentValue, index) => this.ipcRenderer.on(`ngx-electron-click-tray-context-menu-item-${index}-${timestamp}`,
+            //         () => this.ngZone.run(() => setTimeout(() => {
+            //             debugger;
+            //             currentValue.click && currentValue.click();
+            //         }))));
+            this.electron.ipcRenderer.send('ngx-electron-renderer-set-tray-context-menu', template, timestamp);
+        }
     }
 
     /**
      * 检测更新
      */
     checkForUpdates() {
-        console.log('************checkForUpdates START***************');
-        this.electron.ipcRenderer.send('ngx-electron-check-for-updates');
-        console.log('************checkForUpdates END***************');
+        if (this.isElectron) {
+            console.log('************checkForUpdates START***************');
+            this.electron.ipcRenderer.send('ngx-electron-check-for-updates');
+            console.log('************checkForUpdates END***************');
+        }
     }
 
 
     downloadUpdate(): void {
-        console.log('************downloadUpdate START***************');
-        this.electron.ipcRenderer.send('ngx-electron-download-update');
-        console.log('************downloadUpdate END***************');
+        if (this.isElectron) {
+            console.log('************downloadUpdate START***************');
+            this.electron.ipcRenderer.send('ngx-electron-download-update');
+            console.log('************downloadUpdate END***************');
+        }
     }
 
     quitAndInstall(): void {
-        console.log('************quitAndInstall START***************');
-        this.electron.ipcRenderer.send('ngx-electron-quit-and-install');
-        console.log('************quitAndInstall END***************');
+        if (this.isElectron) {
+            console.log('************quitAndInstall START***************');
+            this.electron.ipcRenderer.send('ngx-electron-quit-and-install');
+            console.log('************quitAndInstall END***************');
+        }
     }
 
 }

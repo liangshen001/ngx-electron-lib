@@ -63,7 +63,7 @@ function initTrayListener() {
     });
 
     // 单击菜单
-    ipcMain.on('ngx-electron-set-tray-context-menu', (event, template, timestamp) => {
+    ipcMain.on('ngx-electron-renderer-set-tray-context-menu', (event, template, timestamp) => {
         console.log(JSON.stringify(template));
         if (appTray) {
             appTray.setContextMenu(Menu.buildFromTemplate(template.map((currentValue, index) => ({

@@ -68,7 +68,8 @@
         "serve": {
           "builder": "@ngx-electron/builder:dev-server",
           "options": {
-            "browserTarget": "ngx-electron-lib:build"
+            "browserTarget": "ngx-electron-lib:build",
+              "port": 8080
           },
           "configurations": {
             "production": {
@@ -152,6 +153,7 @@
         "electron-server-start": {
           "builder": "@ngx-electron/builder:server-start",
           "options": {
+            "electronRoot": "electron",
             "devServerTarget": "ngx-electron-lib:serve"
           },
           "configurations": {

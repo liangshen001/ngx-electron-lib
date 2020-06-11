@@ -5,8 +5,8 @@
   "$impl": "./new",
   "options": [
     {
-      "flags": "-s, --store",
-      "desc": "加入依赖@ngx-electron/store(引入ngrx相关的模块)"
+      "flags": "--redux",
+      "desc": "加入依赖@ngx-electron/redux(引入ngrx相关的模块)"
     },
     {
       "flags": "--skip-install",

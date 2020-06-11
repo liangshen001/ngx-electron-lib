@@ -3,4 +3,5 @@
  */
 
 export * from './lib/redux.service';
-export * from './lib/redux.module';
+export * from './lib/electron-store';
+export {ReduxModule as NgxElectronReduxModule} from './lib/redux.module';

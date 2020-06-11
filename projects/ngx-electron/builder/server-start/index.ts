@@ -1,5 +1,5 @@
-import {DevServerBuilderOutput, executeDevServerBuilder} from '@angular-devkit/build-angular';
-import {Observable} from 'rxjs';
+import {DevServerBuilderOptions, DevServerBuilderOutput, executeDevServerBuilder} from '@angular-devkit/build-angular';
+import {Observable, of} from 'rxjs';
 import {BuilderContext, createBuilder, targetFromTargetString} from '@angular-devkit/architect';
 import {flatMap, map} from 'rxjs/operators';
 import {getOptions, spawn} from '../utils';
@@ -19,27 +19,35 @@ function commandBuilder(
     context: BuilderContext,
 ): Observable<DevServerBuilderOutput> {
     const devServerTarget = targetFromTargetString(options.devServerTarget);
-    return fromPromise(context.getTargetOptions(devServerTarget)).pipe(
-        flatMap(rawBrowserOptions => {
+    let started = false;
+
+    return spawn(context, 'tsc', ['-p', path.join(process.cwd(), options.electronRoot)]).pipe(
+        flatMap(() => fromPromise(context.getTargetOptions(devServerTarget))),
+        flatMap((rawBrowserOptions: DevServerBuilderOptions) => {
             rawBrowserOptions.host = rawBrowserOptions.host || 'localhost';
-            rawBrowserOptions.port = rawBrowserOptions.port || 8080;
-            return executeDevServerBuilder(rawBrowserOptions as any, context as any, {
+            rawBrowserOptions.port = rawBrowserOptions.port || 4200;
+            rawBrowserOptions.watch = true;
+            rawBrowserOptions.liveReload = true;
+            return executeDevServerBuilder(rawBrowserOptions, context as any, {
                 webpackConfiguration: config => ({
                     ...config,
                     target: 'electron-renderer'
                 })
             }).pipe(
-                flatMap(data => spawn(context, 'tsc', ['-p', path.join(process.cwd(), options.electronRoot)]).pipe(
-                    map(() => data)
-                )),
-                flatMap(data => spawn(context, 'electron', ['.', '--server', ...getOptions({
-                    host: rawBrowserOptions.host,
-                    port: rawBrowserOptions.port,
-                    'open-dev-tools': true
-                }, true)]).pipe(
-                    map(() => data)
-                ))
+                flatMap(data => {
+                    if (started) {
+                        return of(data);
+                    }
+                    started = true;
+                    return spawn(context, 'electron', ['.', '--server', ...getOptions({
+                        host: rawBrowserOptions.host,
+                        port: rawBrowserOptions.port,
+                        'open-dev-tools': true
+                    }, true)]).pipe(
+                        map(() => data)
+                    );
+                })
             );
-        })
+        }),
     );
 }

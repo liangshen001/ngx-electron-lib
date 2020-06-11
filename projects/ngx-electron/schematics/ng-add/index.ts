@@ -46,7 +46,7 @@ app.on('activate', () => {
 });`;
 
 interface NgAddOptions {
-    store: boolean;
+    redux: boolean;
     skipInstall: boolean;
 }
 
@@ -96,13 +96,16 @@ export function ngAdd(options: NgAddOptions): Rule {
 
         addToPackageJson(tree, '@ngx-electron/main', ngxElectronVersion, 'dependencies');
         addToPackageJson(tree, '@ngx-electron/builder', ngxElectronVersion, 'devDependencies');
-        addToPackageJson(tree, '@ngx-electron/core', ngxElectronVersion, 'devDependencies');
+        addToPackageJson(tree, '@ngx-electron/core', ngxElectronVersion, 'dependencies');
         addToPackageJson(tree, 'electron-updater', '~4.2.0', 'dependencies');
         addToPackageJson(tree, 'electron-builder', '^22.7.0', 'devDependencies');
         addToPackageJson(tree, 'electron-reload', '~1.5.0', 'dependencies');
         addToPackageJson(tree, 'electron', '~7.1.7', 'devDependencies');
-        if (options.store) {
-            addToPackageJson(tree, '@ngx-electron/store', ngxElectronVersion, 'devDependencies');
+        if (options.redux) {
+            addToPackageJson(tree, '@ngx-electron/redux', ngxElectronVersion, 'dependencies');
+            addToPackageJson(tree, '@ngrx/effects', '^8.6.0', 'dependencies');
+            addToPackageJson(tree, '@ngrx/entity', '^8.6.0', 'dependencies');
+            addToPackageJson(tree, '@ngrx/store', '^8.6.0', 'dependencies');
         }
 
         const sourceText = tree.read('package.json')!.toString('utf-8');
