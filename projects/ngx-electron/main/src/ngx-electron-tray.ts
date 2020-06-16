@@ -1,7 +1,7 @@
 import {ipcMain, Tray, nativeImage, NativeImage, app, Menu} from 'electron';
 import * as http from 'http';
 import {isMac} from './ngx-electron-main-util';
-import {host, isServer, port} from './ngx-electron-main-args';
+import {host, isServe, port} from './ngx-electron-main-args';
 import * as path from 'path';
 
 let appTray: Tray;
@@ -44,7 +44,7 @@ function createTray(imageUrl: string, isWeb = false) {
     if (isMac()) {
         return null;
     }
-    if (isServer && !isWeb) {
+    if (isServe && !isWeb) {
         imageUrl = `http://${ host }:${ port }/${imageUrl}`;
     }
     convertImgToNativeImage(imageUrl, isWeb)

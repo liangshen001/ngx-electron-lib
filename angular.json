@@ -66,7 +66,7 @@
           }
         },
         "serve": {
-          "builder": "@ngx-electron/builder:dev-server",
+          "builder": "@ngx-electron/builder:dev-serve",
           "options": {
             "browserTarget": "ngx-electron-lib:build",
               "port": 8080
@@ -139,19 +139,8 @@
             }
           }
         },
-        "electron-browser": {
-          "builder": "@ngx-electron/builder:browser",
-          "options": {
-            "browserTarget": "ngx-electron-lib:build"
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "ngx-electron-lib:build:production"
-            }
-          }
-        },
-        "electron-server-start": {
-          "builder": "@ngx-electron/builder:server-start",
+        "electron-serve-start": {
+          "builder": "@ngx-electron/builder:serve-start",
           "options": {
             "electronRoot": "electron",
             "devServerTarget": "ngx-electron-lib:serve"
@@ -207,41 +196,6 @@
             "exclude": [
               "**/node_modules/**"
             ]
-          }
-        }
-      }
-    },
-    "@ngx-electron/store": {
-      "projectType": "library",
-      "root": "projects/ngx-electron/store",
-      "sourceRoot": "projects/ngx-electron/store/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
-          "options": {
-            "tsConfig": "projects/ngx-electron/store/tsconfig.lib.json",
-            "project": "projects/ngx-electron/store/ng-package.json"
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/ngx-electron/store/src/test.ts",
-            "tsConfig": "projects/ngx-electron/store/tsconfig.spec.json",
-            "karmaConfig": "projects/ngx-electron/store/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/ngx-electron/store/tsconfig.lib.json",
-              "projects/ngx-electron/store/tsconfig.spec.json"
-            ],
-              "exclude": [
-                  "**/node_modules/**"
-              ]
           }
         }
       }

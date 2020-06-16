@@ -47,7 +47,7 @@ function commandBuilder(
                 linux: options.linux
             }),
             ...getOptions({
-                config: `${path.join(process.cwd(), options.config)}`
+                config: options.config && `${path.join(process.cwd(), options.config)}`
             }, true)
         ]).pipe(
             map(() => data)

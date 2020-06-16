@@ -39,7 +39,7 @@ function commandBuilder(
                         return of(data);
                     }
                     started = true;
-                    return spawn(context, 'electron', ['.', '--server', ...getOptions({
+                    return spawn(context, 'electron', ['.', '--serve', ...getOptions({
                         host: rawBrowserOptions.host,
                         port: rawBrowserOptions.port,
                         'open-dev-tools': true

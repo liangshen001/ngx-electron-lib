@@ -19,7 +19,7 @@ export function action(project, {
                 cwd: project
             });
             spawn('npx', ['wait-on', `http-get://${host}:${port}/`])
-                .then(() => spawn('npx', ['electron', project, '--server',
+                .then(() => spawn('npx', ['electron', project, '--serve',
                     ...getArgs({host, port}, true)]));
         });
 }

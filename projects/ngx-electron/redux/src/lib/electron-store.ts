@@ -1,7 +1,7 @@
-import {Action, ActionsSubject, ReducerManager, State, StateObservable, Store} from '@ngrx/store';
+import {Action, ActionsSubject, ReducerManager, StateObservable, Store} from '@ngrx/store';
 import {Injectable, NgZone} from '@angular/core';
 import {ElectronService} from '@ngx-electron/core';
-import {BrowserWindow, IpcMainEvent} from 'electron';
+import {BrowserWindow, WebContents} from 'electron';
 import {take} from 'rxjs/operators';
 
 @Injectable({
@@ -11,7 +11,6 @@ export class ElectronStore<T> extends Store<T> {
 
     constructor(private electronService: ElectronService,
                 private ngZone: NgZone,
-                private state$$: State<T>,
                 state$: StateObservable,
                 actionsObserver: ActionsSubject,
                 reducerManager: ReducerManager) {
@@ -21,15 +20,29 @@ export class ElectronStore<T> extends Store<T> {
             // dispatch action
             this.electronService.electron.ipcRenderer.on(`ngx-electron-action-shared-${windowsId}`,
                 (event, action) => this.ngZone.run(() => super.dispatch(action)));
-            this.electronService.electron.ipcRenderer.on(`ngx-electron-synchronized-state`,
-                (event, state) => this.ngZone.run(() => this.state$$.next(state)));
+
+            const reduxSynchronizedType = '@ngx-electron/redux init state';
+            this.electronService.electron.ipcRenderer.once(`ngx-electron-synchronized-state`,
+                (event, state) => this.ngZone.run(() => {
+                    const reducers = (reducerManager as any).reducers;
+                    Object.keys(reducers).forEach(key => {
+                        const reducer = reducers[key];
+                        reducers[key] = (s, action) => {
+                            if (action.type === reduxSynchronizedType) {
+                                return action.state;
+                            }
+                            return reducer.call(this, s, action);
+                        };
+                        this.addReducer(key, reducers[key]);
+                        setTimeout(() => this.dispatch({type: reduxSynchronizedType, state: state[key]}));
+                    });
+                }));
         }
     }
 
-    synchronized(event: IpcMainEvent) {
-        this.state$$.pipe(
-            take(1),
-        ).subscribe(state => event.sender.send(`ngx-electron-synchronized-state`, state));
+    synchronized(targetWebContents: WebContents) {
+        this.pipe(take(1)).subscribe(state =>
+            targetWebContents.send(`ngx-electron-synchronized-state`, state));
     }
 
 

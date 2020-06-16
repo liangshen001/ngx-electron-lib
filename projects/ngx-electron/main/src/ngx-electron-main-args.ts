@@ -1,6 +1,6 @@
 import {ipcMain} from 'electron';
 
-let isServer = false;
+let isServe = false;
 let host;
 let port;
 let openDevTools;
@@ -21,8 +21,8 @@ function getArgValue(args: string[], name: string): string | boolean {
 function initArgs() {
     const args = process.argv.splice(2);
     console.log(`初始化ngx-electron-main, 启动参数：${JSON.stringify(args)}`);
-    isServer = args.includes('--server');
-    if (isServer) {
+    isServe = args.includes('--serve');
+    if (isServe) {
         console.log('加载服务的方式运行');
         port = getArgValue(args, '--port') || 8080;
         host = getArgValue(args, '--host') || 'localhost';
@@ -32,13 +32,13 @@ function initArgs() {
     openDevTools = args.includes('--open-dev-tools');
 
     // 判断是否以服务的形式加载页面
-    ipcMain.on('ngx-electron-is-server', event => event.returnValue = isServer);
+    ipcMain.on('ngx-electron-is-serve', event => event.returnValue = isServe);
     // 如果当前以服务的形式加载页面，得到当前服务的port
     ipcMain.on('ngx-electron-get-port', event => event.returnValue = port);
     // 如果当前以服务的形式加载页面，得到当前服务的host
     ipcMain.on('ngx-electron-get-host', event => event.returnValue = host);
     // 是否打开应用调试器
-    ipcMain.on('ngx-electron-is-open-dev-tools', event => event.returnValue = openDevTools || isServer);
+    ipcMain.on('ngx-electron-is-open-dev-tools', event => event.returnValue = openDevTools || isServe);
 }
 
-export {isServer, host, port, openDevTools, initArgs};
+export {isServe, host, port, openDevTools, initArgs};

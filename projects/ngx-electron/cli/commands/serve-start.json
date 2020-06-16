@@ -1,7 +1,7 @@
 {
   "desc": "启动服务运行web页面，然后应用来加载服务上的web页面",
   "alias": "ss",
-  "$impl": "./server-start",
+  "$impl": "./serve-start",
   "usage": "<project> [options]",
   "options": [
     {

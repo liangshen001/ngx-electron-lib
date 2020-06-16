@@ -1,7 +1,14 @@
 import {BrowserWindow, ipcMain, BrowserWindowConstructorOptions, app, Menu} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-import {host, isServer, openDevTools, port} from './ngx-electron-main-args';
+import * as electronReload from 'electron-reload';
+import {host, isServe, openDevTools, port} from './ngx-electron-main-args';
+
+const s = path.join(app.getAppPath(), 'dist', app.getName());
+console.log(s);
+electronReload(s, {
+
+});
 // winMap
 const winIdMap = new Map<any, number>();
 
@@ -9,14 +16,10 @@ export type BrowserWindowOptions = BrowserWindowConstructorOptions & {path: stri
 
 function createWindow(options: BrowserWindowOptions): BrowserWindow {
     let win = new BrowserWindow({
-        show: false,
         ...options
     });
     console.log(`创建窗口routerUrl：${options.path}`);
-    if (isServer) {
-        require('electron-reload')(app.getAppPath(), {
-            electron: require(`${app.getAppPath()}/node_modules/electron`)
-        });
+    if (isServe) {
         const loadUrl = `http://${host}:${port}/#${options.path}`;
         console.log(`创建窗口加载服务：${loadUrl}`);
         win.loadURL(loadUrl);
@@ -28,12 +31,13 @@ function createWindow(options: BrowserWindowOptions): BrowserWindow {
             protocol: 'file:',
             slashes: true
         }) + `#${options.path}`);
+        win.webContents.reloadIgnoringCache();
     }
     if (options.key) {
         winIdMap.set(options.key, win.id);
     }
-    if (isServer || openDevTools) {
-        console.log(`isServer：${isServer} openDevTools：${openDevTools} 打开窗口调试工具`);
+    if (isServe || openDevTools) {
+        console.log(`isServe：${isServe} openDevTools：${openDevTools} 打开窗口调试工具`);
         win.webContents.openDevTools();
     }
     win.on('ready-to-show', () => {

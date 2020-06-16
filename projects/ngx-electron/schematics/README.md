@@ -26,7 +26,7 @@ UPDATE package.json (2031 bytes)
 
 ```
 ## Start the Angular application on port 8080, and electron loads the Angular application
-npm run electron-server-start
+npm run electron-serve-start
 
 ## The Angular application is packaged locally and transmitted loads the Angular application
 npm run electron-local-start

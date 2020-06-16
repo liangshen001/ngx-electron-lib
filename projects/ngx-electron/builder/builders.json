@@ -5,10 +5,10 @@
             "schema": "./build/schema.json",
             "description": "build."
         },
-        "server-start": {
-            "implementation": "./server-start",
-            "schema": "./server-start/schema.json",
-            "description": "server-start."
+        "serve-start": {
+            "implementation": "./serve-start",
+            "schema": "./serve-start/schema.json",
+            "description": "serve-start."
         },
         "local-start": {
             "implementation": "./local-start",

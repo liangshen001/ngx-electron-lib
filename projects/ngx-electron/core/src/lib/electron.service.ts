@@ -66,8 +66,8 @@ export class ElectronService {
      */
     isElectron = !!window.navigator.userAgent.match(/Electron/);
 
-    get isServer(): boolean {
-        return this.isElectron && this.electron.ipcRenderer.sendSync('ngx-electron-is-server');
+    get isServe(): boolean {
+        return this.isElectron && this.electron.ipcRenderer.sendSync('ngx-electron-is-serve');
     }
 
     get isOpenDevTools(): boolean {
@@ -165,7 +165,7 @@ export class ElectronService {
                     show: false,
                     ...options
                 });
-                const httpUrl = this.isServer ? `http://${location.hostname}:${location.port}/#${options.path}` :
+                const httpUrl = this.isServe ? `http://${location.hostname}:${location.port}/#${options.path}` :
                     `${url.format({
                         pathname: path.join(this.electron.remote.app.getAppPath(),
                             'dist', this.electron.remote.app.getName(), 'index.html'),

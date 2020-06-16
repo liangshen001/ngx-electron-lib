@@ -25,12 +25,6 @@
       "@ngx-electron/core/*": [
         "dist/ngx-electron/core/*"
       ],
-      "@ngx-electron/store": [
-        "dist/ngx-electron/store"
-      ],
-      "@ngx-electron/store/*": [
-        "dist/ngx-electron/store/*"
-      ],
       "@ngx-electron/redux": [
         "dist/ngx-electron/redux"
       ],

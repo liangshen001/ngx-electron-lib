@@ -7,13 +7,16 @@ initElectronMainIpcListener();
 function init() {
     // createTray('icon/logo.png');
     win = createWindow({
-        path: '',
+        path: 'page1',
         key: '',
         width: 1024,
         height: 768,
+        show: true,
         title: 'ngx-electron-lib',
+        skipTaskbar: true,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            webSecurity: false
         }
     });
     win.on('close', () => app.quit());

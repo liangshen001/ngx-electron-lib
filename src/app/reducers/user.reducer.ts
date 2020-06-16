@@ -18,7 +18,6 @@ const _userReducer = createReducer(
     adapter.getInitialState(),
     on(loadUserListSuccess, (state, action) => adapter.addAll(action.users, state)),
     on(deleteUser, (state, action) => {
-        debugger;
         return adapter.removeOne(action.id, state);
     }),
     on(updateUser, (state, action) => adapter.updateOne({
@@ -33,7 +32,6 @@ const _userReducer = createReducer(
 );
 
 export function userReducer(state, action): UserReducerState {
-    debugger;
     return _userReducer(state, action);
 }
 

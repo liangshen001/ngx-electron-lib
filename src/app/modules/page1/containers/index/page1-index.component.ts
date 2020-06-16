@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActionsSubject, ReducerManager, StateObservable, Store} from '@ngrx/store';
-import {UserReducerState} from '../../../../reducers/user.reducer';
+import {ActionsSubject, ReducerManager, StateObservable} from '@ngrx/store';
 import {ElectronService} from '@ngx-electron/core';
 import {Router} from '@angular/router';
 import {loadUserList} from '../../../../actions/user.action';
@@ -8,7 +7,6 @@ import {ElectronStore} from '@ngx-electron/redux';
 import {AppState} from '../../../../reducers';
 import {BrowserWindow} from 'electron';
 import {take} from 'rxjs/operators';
-import {Observable} from 'rxjs';
 
 @Component({
     selector: 'app-page1',
@@ -31,15 +29,11 @@ export class Page1IndexComponent implements OnInit {
                 private reducerManager: ReducerManager,
                 private router: Router,
                 private store$: ElectronStore<AppState>) {
-        // this.heroService.getAll({
-        //     isOptimistic: true,
-        //     mergeStrategy: MergeStrategy.PreserveChanges
-        // });
-
+        // const a = new this.electronService.electron.remote.Tray('');
+        // console.log(a);
         this.state$.pipe(
             take(1)
         ).subscribe(state => {
-        debugger;
         });
         // const tray = new this.electronService.electron.remote.Tray('');
     }
@@ -59,21 +53,21 @@ export class Page1IndexComponent implements OnInit {
         // console.log(`加载url:${url}`);
         // win.loadURL(httpurl);
         // win.webContents.openDevTools();
-        if (this.electronService.isElectron) {
-            this.page2Win = this.electronService.createWindow({
-                path: 'page2',
-                key: 'page2',
-                width: 1024,
-                height: 768,
-                title: 'ngx-electron-lib2',
-                webPreferences: {
-                    nodeIntegration: true
-                },
-                callback: event => this.store$.synchronized(event)
-            });
-        } else {
+        // if (this.electronService.isElectron) {
+        //     this.page2Win = this.electronService.createWindow({
+        //         path: 'page2',
+        //         key: 'page2',
+        //         width: 1024,
+        //         height: 768,
+        //         title: 'ngx-electron-lib2',
+        //         webPreferences: {
+        //             nodeIntegration: true
+        //         },
+        //         callback: event => this.store$.synchronized(event.sender)
+        //     });
+        // } else {
             this.router.navigateByUrl('page2');
-        }
+        // }
         // this.electronService.openPage('page2', {
         //     width: 1024,
         //     height: 768,
@@ -102,7 +96,7 @@ export class Page1IndexComponent implements OnInit {
                 webPreferences: {
                     nodeIntegration: true
                 },
-                callback: event => this.store$.synchronized(event)
+                callback: event => this.store$.synchronized(event.sender)
             });
         } else {
             this.router.navigateByUrl('page3');

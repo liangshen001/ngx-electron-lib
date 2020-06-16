@@ -51,8 +51,6 @@
         "oneClick": false,
         "perMachine": true,
         "allowToChangeInstallationDirectory": true,
-        "installerIcon": "src/favicon.ico",
-        "uninstallerIcon": "src/favicon.ico",
         "artifactName": "${productName}-${version}-${os}-${arch}-setup.${ext}",
         "deleteAppDataOnUninstall": true
     }

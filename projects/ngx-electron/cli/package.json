@@ -1,6 +1,6 @@
 {
   "name": "@ngx-electron/cli",
-  "version": "8.8.31",
+  "version": "8.8.33",
   "main": "index.js",
   "dependencies": {
     "commander": "^4.0.1",
@@ -10,7 +10,7 @@
   "peerDependencies": {
     "electron": "^7.1.7",
     "@angular/cli": "~8.3.21",
-    "electron-builder": "22.6.1",
+    "electron-builder": "22.4.0",
     "electron-updater": "^4.2.0",
     "electron-reload": "^1.5.0",
     "@angular/core": "~8.2.14",

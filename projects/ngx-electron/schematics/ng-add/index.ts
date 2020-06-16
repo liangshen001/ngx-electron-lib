@@ -70,8 +70,8 @@ export function ngAdd(options: NgAddOptions): Rule {
         createELectronTsconfigJson(tree);
 
 
-        addToPackageJson(tree, 'electron-server-start',
-            'ng run ' + angularJson.defaultProject + ':electron-server-start', 'scripts');
+        addToPackageJson(tree, 'electron-serve-start',
+            'ng run ' + angularJson.defaultProject + ':electron-serve-start', 'scripts');
         addToPackageJson(tree, 'electron-local-start',
             'ng run ' + angularJson.defaultProject + ':electron-local-start', 'scripts');
         addToPackageJson(tree, 'electron-build:win',
@@ -81,8 +81,8 @@ export function ngAdd(options: NgAddOptions): Rule {
         addToPackageJson(tree, 'electron-build:linux',
             'ng run ' + angularJson.defaultProject + ':electron-build --linux', 'scripts');
         Object.keys(configurations).forEach(key => {
-            addToPackageJson(tree, 'electron-server-start:' + key,
-                'ng run ' + angularJson.defaultProject + ':electron-server-start:' + key, 'scripts');
+            addToPackageJson(tree, 'electron-serve-start:' + key,
+                'ng run ' + angularJson.defaultProject + ':electron-serve-start:' + key, 'scripts');
             addToPackageJson(tree, 'electron-local-start:' + key,
                 'ng run ' + angularJson.defaultProject + ':electron-local-start:' + key, 'scripts');
             addToPackageJson(tree, 'electron-build:win:' + key,
@@ -208,8 +208,6 @@ function createELectronELectronBuilderJson(tree: Tree) {
             oneClick: false,
             perMachine: true,
             allowToChangeInstallationDirectory: true,
-            installerIcon: 'src/favicon.ico',
-            uninstallerIcon: 'src/favicon.ico',
             artifactName: '${productName}-${version}-${os}-${arch}-setup.${ext}',
             deleteAppDataOnUninstall: true
         }
@@ -243,8 +241,8 @@ function addArchitectToAngularJson(tree: Tree) {
         },
         configurations: getConfigurations('browserTarget', browserTarget)
     };
-    architect['electron-server-start'] = {
-        builder: '@ngx-electron/builder:server-start',
+    architect['electron-serve-start'] = {
+        builder: '@ngx-electron/builder:serve-start',
         options: {
             electronRoot: 'electron',
             devServerTarget

@@ -1,12 +1,14 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
 import {User} from '../../../../models/user';
-import {select, State, Store} from '@ngrx/store';
+import {INITIAL_STATE, ReducerManager, select, State, Store} from '@ngrx/store';
 import {addUser, deleteUser, updateUser} from '../../../../actions/user.action';
 import {getAllUsers, UserReducerState} from '../../../../reducers/user.reducer';
 import {ElectronStore} from '@ngx-electron/redux';
 import {ElectronService} from '@ngx-electron/core';
 import {AppState} from '../../../../reducers';
+import {tap} from 'rxjs/operators';
+import {_INITIAL_STATE} from '@ngrx/store/src/tokens';
 
 @Component({
     selector: 'app-user-table',
@@ -22,12 +24,16 @@ export class UserTableComponent implements OnInit {
     constructor(private electronStore: ElectronStore<UserReducerState>,
                 private store$: Store<AppState>,
                 private state: State<any>,
+                private reducerManager: ReducerManager,
+                @Inject(INITIAL_STATE)private initialState: any,
                 private electronService: ElectronService) {
     }
 
     ngOnInit(): void {
         this.users$ = this.store$.pipe(
-            select(getAllUsers)
+            select(getAllUsers),
+            tap(a => {
+            })
         );
     }
 
