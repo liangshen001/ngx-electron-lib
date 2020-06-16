@@ -1,24 +1,79 @@
-# Build
+# @ngx-electron/builder
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.14.
+Provides a set of Angular Architect（angular.json）
 
-## Code scaffolding
+## @ngx-electron/builder:browser
 
-Run `ng generate component component-name --project build` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project build`.
-> Note: Don't forget to add `--project build` or else it will be added to the default project in your `angular.json` file. 
+Use @ngx-electron/builder:browser instead of @angular-devkit/build-angular:browser in angular.json.
+Add some information when using WebPack.
 
-## Build
+```
+webpackConfiguration: config => ({
+    ...config,
+    target: 'web',
+    node: {fs: 'empty'}
+})
+```
 
-Run `ng build build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## @ngx-electron/builder:dev-server
 
-## Publishing
+Use @ngx-electron/builder:dev-server instead of @angular-devkit/build-angular:dev-server in angular.json.
+Add some information when using WebPack.
 
-After building your library with `ng build build`, go to the dist folder `cd dist/build` and run `npm publish`.
+```
+webpackConfiguration: config => ({
+    ...config,
+    target: 'web',
+    node: {fs: 'empty'}
+})
+```
 
-## Running unit tests
+## @ngx-electron/builder:build
 
-Run `ng test build` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```
+"electron-build": {
+  "builder": "@ngx-electron/builder:build",
+  "options": {
+    "electronRoot": "electron",
+    "config": "electron/electron-builder.json",
+    "browserTarget": "ngx-electron-lib:build"
+  },
+  "configurations": {
+    "production": {
+      "browserTarget": "ngx-electron-lib:build:production"
+    }
+  }
+}
+```
 
-## Further help
+## @ngx-electron/builder:serve-start
+```
+"electron-serve-start": {
+  "builder": "@ngx-electron/builder:serve-start",
+  "options": {
+    "electronRoot": "electron",
+    "devServerTarget": "ngx-electron-lib:serve"
+  },
+  "configurations": {
+    "production": {
+      "devServerTarget": "ngx-electron-lib:serve:production"
+    }
+  }
+}
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## @ngx-electron/builder:local-start
+```
+"electron-local-start": {
+  "builder": "@ngx-electron/builder:local-start",
+  "options": {
+      "electronRoot": "electron",
+      "browserTarget": "ngx-electron-lib:build"
+  },
+  "configurations": {
+    "production": {
+        "browserTarget": "ngx-electron-lib:build:production"
+    }
+  }
+}
+```
