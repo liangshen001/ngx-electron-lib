@@ -4,6 +4,10 @@
         "ng-add": {
             "description": "Add my library to the project.",
             "factory": "./ng-add/index#ngAdd"
+        },
+        "ng-update": {
+            "description": "Update library",
+            "factory": "./ng-update/index#ngUpdate"
         }
     }
 }
