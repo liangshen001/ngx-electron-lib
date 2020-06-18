@@ -15,6 +15,11 @@ targetJson.peerDependencies['electron-updater'] = json.dependencies['electron-up
 targetJson.peerDependencies['electron-reload'] = json.dependencies['electron-reload'];
 targetJson.peerDependencies['@angular/core'] = json.dependencies['@angular/core'];
 targetJson.peerDependencies['@angular/common'] = json.dependencies['@angular/common'];
+if (libName === 'schematics' || libName === 'redux') {
+    targetJson.peerDependencies['@ngrx/effects'] = json.dependencies['@ngrx/effects'];
+    targetJson.peerDependencies['@ngrx/entity'] = json.dependencies['@ngrx/entity'];
+    targetJson.peerDependencies['@ngrx/store'] = json.dependencies['@ngrx/store'];
+}
 writeJson(packagePath, targetJson);
 
 

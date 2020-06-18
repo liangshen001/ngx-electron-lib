@@ -1,7 +1,7 @@
 import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 
-const ngxElectronVersion = require('../package.json').version;
+const packageJson = require('../package.json');
 
 const mainTsContent = (name: string) => `import {app, BrowserWindow} from 'electron';
 import {createTray, createWindow, initElectronMainIpcListener, isMac} from '@ngx-electron/main';
@@ -11,7 +11,8 @@ initElectronMainIpcListener();
 
 function init() {
     // createTray('icon/logo.png');
-    win = createWindow('', {
+    win = createWindow({
+        path: '',
         width: 1024,
         height: 768,
         title: '${name}',
@@ -94,18 +95,18 @@ export function ngAdd(options: NgAddOptions): Rule {
         });
 
 
-        addToPackageJson(tree, '@ngx-electron/main', ngxElectronVersion, 'dependencies');
-        addToPackageJson(tree, '@ngx-electron/builder', ngxElectronVersion, 'devDependencies');
-        addToPackageJson(tree, '@ngx-electron/core', ngxElectronVersion, 'dependencies');
-        addToPackageJson(tree, 'electron-updater', '~4.2.0', 'dependencies');
-        addToPackageJson(tree, 'electron-builder', '^22.7.0', 'devDependencies');
-        addToPackageJson(tree, 'electron-reload', '~1.5.0', 'dependencies');
-        addToPackageJson(tree, 'electron', '~7.1.7', 'devDependencies');
+        addToPackageJson(tree, '@ngx-electron/main', packageJson.version, 'dependencies');
+        addToPackageJson(tree, '@ngx-electron/builder', packageJson.version, 'devDependencies');
+        addToPackageJson(tree, '@ngx-electron/core', packageJson.version, 'dependencies');
+        addToPackageJson(tree, 'electron-updater', packageJson.peerDependencies['electron-updater'], 'dependencies');
+        addToPackageJson(tree, 'electron-builder', packageJson.peerDependencies['electron-builder'], 'devDependencies');
+        addToPackageJson(tree, 'electron-reload', packageJson.peerDependencies['electron-reload'], 'dependencies');
+        addToPackageJson(tree, 'electron', packageJson.peerDependencies.electron, 'devDependencies');
         if (options.redux) {
-            addToPackageJson(tree, '@ngx-electron/redux', ngxElectronVersion, 'dependencies');
-            addToPackageJson(tree, '@ngrx/effects', '^8.6.0', 'dependencies');
-            addToPackageJson(tree, '@ngrx/entity', '^8.6.0', 'dependencies');
-            addToPackageJson(tree, '@ngrx/store', '^8.6.0', 'dependencies');
+            addToPackageJson(tree, '@ngx-electron/redux', packageJson.version, 'dependencies');
+            addToPackageJson(tree, '@ngrx/effects', packageJson.peerDependencies['@ngrx/effects'], 'dependencies');
+            addToPackageJson(tree, '@ngrx/entity', packageJson.peerDependencies['@ngrx/entity'], 'dependencies');
+            addToPackageJson(tree, '@ngrx/store', packageJson.peerDependencies['@ngrx/store'], 'dependencies');
         }
 
         const sourceText = tree.read('package.json')!.toString('utf-8');

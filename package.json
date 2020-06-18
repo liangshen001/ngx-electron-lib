@@ -1,6 +1,6 @@
 {
   "name": "ngx-electron-lib",
-  "version": "8.8.33",
+  "version": "8.8.35",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "ng build",
@@ -43,7 +43,6 @@
     "@angular/platform-browser": "~8.2.14",
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
-    "@ngrx/data": "^8.6.0",
     "@ngrx/effects": "^8.6.0",
     "@ngrx/entity": "^8.6.0",
     "@ngrx/store": "^8.6.0",
