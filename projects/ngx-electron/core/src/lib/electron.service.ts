@@ -1,6 +1,6 @@
 import {Injectable, NgZone} from '@angular/core';
 import {Router} from '@angular/router';
-import {concat, Observable} from 'rxjs';
+import {concat, Observable, Subject} from 'rxjs';
 import {TrayProxy} from './models';
 import {
     BrowserWindow,
@@ -14,6 +14,7 @@ import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as path from 'path';
+import {autoUpdater} from 'electron-updater';
 
 export type BrowserWindowOptions =
     BrowserWindowConstructorOptions
@@ -31,6 +32,26 @@ export class ElectronService {
     fs?: typeof fs;
 
     private _tray: TrayProxy;
+
+    autoUpdater: {
+        error: Observable<any>,
+        checkingForUpdate: Observable<void>,
+        updateAvailable: Observable<{
+            files: {sha512: string; size: number; url: string}[];
+            path: string;
+            releaseDate: string;
+            sha512: string;
+            version: string;
+        }>,
+        updateNotAvailable: Observable<any>,
+        downloadProgress: Observable<any>,
+        updateDownloateDownloaded: Observable<{
+            event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate
+        }>,
+        checkForUpdates(): void,
+        downloadUpdate(): void,
+        quitAndInstall(isSilent?: boolean, isForceRunAfter?: boolean): void,
+    };
 
     get tray(): TrayProxy {
         if (this._tray) {
@@ -100,6 +121,38 @@ export class ElectronService {
             return;
         }
         this.electron = (window as any).require('electron');
+        this.autoUpdater = {
+            error: new Observable(subscriber => {
+                this.electron.ipcRenderer.on('ngx-electron-main-updator-error', (event, error) => subscriber.next(error));
+            }),
+            checkingForUpdate: new Observable(subscriber => {
+                this.electron.ipcRenderer.on('ngx-electron-main-checking-for-update', () => subscriber.next());
+            }),
+            updateAvailable: new Observable(subscriber => {
+                this.electron.ipcRenderer.on('ngx-electron-main-update-available', (e, info) => subscriber.next(info));
+            }),
+            updateNotAvailable: new Observable(subscriber => {
+                this.electron.ipcRenderer.on('ngx-electron-main-update-not-available', (e, info) => subscriber.next(info));
+            }),
+            downloadProgress: new Observable(subscriber => {
+                this.electron.ipcRenderer.on('ngx-electron-main-download-progress', () => subscriber.next());
+            }),
+            updateDownloateDownloaded: new Observable(subscriber => {
+                this.electron.ipcRenderer.on('ngx-electron-main-update-downloate-downloaded',
+                    (e, event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) => subscriber.next({
+                        event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate
+                    }));
+            }),
+            checkForUpdates: () => {
+                this.electron.ipcRenderer.send('ngx-electron-renderer-check-for-updates');
+            },
+            downloadUpdate: () => {
+                this.electron.ipcRenderer.send('ngx-electron-renderer-download-update');
+            },
+            quitAndInstall: (isSilent?: boolean, isForceRunAfter?: boolean) => {
+                this.electron.ipcRenderer.send('ngx-electron-renderer-quit-and-install', isSilent, isForceRunAfter);
+            }
+        };
         this.childProcess = (window as any).require('child_process');
         this.fs = (window as any).require('fs');
 

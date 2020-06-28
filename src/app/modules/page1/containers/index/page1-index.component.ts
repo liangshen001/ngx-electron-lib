@@ -35,49 +35,32 @@ export class Page1IndexComponent implements OnInit {
             take(1)
         ).subscribe(state => {
         });
+
+        this.electronService.electron.remote.getCurrentWindow().webContents.openDevTools();
+        this.electronService.autoUpdater.checkingForUpdate.subscribe((a) => {
+            console.log('checkingForUpdate');
+        });
+        this.electronService.autoUpdater.updateAvailable.subscribe((a) => {
+            console.log('updateAvailable' + JSON.stringify(a));
+            this.electronService.autoUpdater.downloadUpdate();
+        });
+        this.electronService.autoUpdater.updateNotAvailable.subscribe((a) => {
+            console.log('updateNotAvailable' + JSON.stringify(a));
+        });
+        this.electronService.autoUpdater.error.subscribe((e) => {
+            console.log('error' + JSON.stringify(e));
+        });
+        this.electronService.autoUpdater.downloadProgress.subscribe((a) => {
+            alert(a);
+        });
+        this.electronService.autoUpdater.updateDownloateDownloaded.subscribe((a) => {
+            alert(a);
+        });
         // const tray = new this.electronService.electron.remote.Tray('');
     }
 
     openPage2() {
-        // const win = new this.electronService.remote.BrowserWindow({
-        //     width: 1024,
-        //     height: 768,
-        //     title: 'ngx-electron-lib2'
-        // });
-        // const httpurl = `${url.format({
-        //     pathname: path.join(this.electronService.remote.app.getAppPath(),
-        //         'dist', this.electronService.remote.app.getName(), 'index.html'),
-        //     protocol: 'file:',
-        //     slashes: true
-        // })}#page2`;
-        // console.log(`加载url:${url}`);
-        // win.loadURL(httpurl);
-        // win.webContents.openDevTools();
-        // if (this.electronService.isElectron) {
-        //     this.page2Win = this.electronService.createWindow({
-        //         path: 'page2',
-        //         key: 'page2',
-        //         width: 1024,
-        //         height: 768,
-        //         title: 'ngx-electron-lib2',
-        //         webPreferences: {
-        //             nodeIntegration: true
-        //         },
-        //         callback: event => this.store$.synchronized(event.sender)
-        //     });
-        // } else {
-            this.router.navigateByUrl('page2');
-        // }
-        // this.electronService.openPage('page2', {
-        //     width: 1024,
-        //     height: 768,
-        //     title: 'ngx-electron-lib2',
-        //     webPreferences: {
-        //         nodeIntegration: true
-        //     }
-        // }, {
-        //     initData: this.title
-        // });
+        this.electronService.autoUpdater.checkForUpdates();
     }
 
     sendData() {
