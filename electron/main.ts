@@ -2,7 +2,7 @@ import {app, BrowserWindow} from 'electron';
 import {createTray, createWindow, initElectronMainIpcListener, isMac} from '@ngx-electron/main';
 
 let win: BrowserWindow;
-initElectronMainIpcListener();
+initElectronMainIpcListener('http://127.0.0.1:8889/');
 
 function init() {
     // createTray('icon/logo.png');
@@ -12,7 +12,6 @@ function init() {
         height: 768,
         show: true,
         title: 'ngx-electron-lib',
-        skipTaskbar: true,
         webPreferences: {
             nodeIntegration: true,
             webSecurity: false

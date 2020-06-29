@@ -14,9 +14,7 @@ function initElectronMainIpcListener(options?: PublishConfiguration | AllPublish
         initTrayListener();
         initUtilListener();
         initWindowListener();
-        if (options) {
-            initUpdateListener(options);
-        }
+        initUpdateListener(options);
     }
 }
 
