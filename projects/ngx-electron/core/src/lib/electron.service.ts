@@ -34,8 +34,16 @@ export class ElectronService {
     private _tray: TrayProxy;
 
     autoUpdater: {
-        error: Observable<any>,
-        checkingForUpdate: Observable<void>,
+        error: Observable<{
+            code: 'ERR_UPDATER_ZIP_FILE_NOT_FOUND' | string
+        }>,
+        checkingForUpdate: Observable<{
+            files: {sha512: string; size: number; url: string}[];
+            path: string;
+            releaseDate: string;
+            sha512: string;
+            version: string;
+        }>,
         updateAvailable: Observable<{
             files: {sha512: string; size: number; url: string}[];
             path: string;

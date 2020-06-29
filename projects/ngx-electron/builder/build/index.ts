@@ -23,8 +23,6 @@ function commandBuilder(
     options: BuildBuilderSchema,
     context: BuilderContext,
 ): Observable<BrowserBuilderOutput> {
-    console.log(options.mac);
-    console.log(options.mac);
     const browserTarget = targetFromTargetString(options.browserTarget);
     return fromPromise(context.getTargetOptions(browserTarget)).pipe(
         flatMap(rawBrowserOptions => {

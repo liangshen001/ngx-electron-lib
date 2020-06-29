@@ -11,6 +11,7 @@ function init() {
         width: 1024,
         height: 768,
         show: true,
+        autoHideMenuBar: true,
         title: 'ngx-electron-lib',
         webPreferences: {
             nodeIntegration: true,

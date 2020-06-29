@@ -18,7 +18,6 @@
         }
     ],
     "dmg": {
-        "backgroundColor": "#FFFFFF",
         "contents": [
             {
                 "x": 130,
