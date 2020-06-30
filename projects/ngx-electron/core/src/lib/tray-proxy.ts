@@ -103,6 +103,7 @@ export class TrayProxy implements Tray {
     }
 
     displayBalloon(options: DisplayBalloonOptions): void {
+        this.ipcRenderer.send('ngx-electron-tray-apply-method', 'displayBalloon', options);
     }
 
     emit(event: string | symbol, ...args: any[]): boolean {
@@ -110,64 +111,68 @@ export class TrayProxy implements Tray {
     }
 
     eventNames(): Array<string | symbol> {
-        return undefined;
+        return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'eventNames');
     }
 
     getBounds(): Rectangle {
-        return undefined;
+        return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'getBounds');
     }
 
     getIgnoreDoubleClickEvents(): boolean {
-        return false;
+        return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'getIgnoreDoubleClickEvents');
     }
 
     getMaxListeners(): number {
-        return 0;
+        return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'getMaxListeners');
     }
 
     getTitle(): string {
-        return '';
+        return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'getTitle');
     }
 
     isDestroyed(): boolean {
-        return false;
+        return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'isDestroyed');
     }
 
     listenerCount(type: string | symbol): number {
-        return 0;
+        return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'listenerCount', type);
     }
 
     listeners(event: string | symbol): [] {
-        return [];
+        return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'listeners', event);
     }
 
     popUpContextMenu(menu?: Menu, position?: Point): void {
     }
 
     prependListener(event: string | symbol, listener: (...args: any[]) => void): this {
-        return undefined;
+        return this;
     }
 
     prependOnceListener(event: string | symbol, listener: (...args: any[]) => void): this {
-        return undefined;
+        return this;
     }
 
     removeAllListeners(event?: string | symbol): this {
-        return undefined;
+        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'removeAllListeners', event);
+        return this;
     }
 
     removeListener(event: any, listener: any): this {
-        return undefined;
+        return this;
     }
 
     setIgnoreDoubleClickEvents(ignore: boolean): void {
+        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setIgnoreDoubleClickEvents', ignore);
     }
 
     setMaxListeners(n: number): this {
-        return undefined;
+        this.ipcRenderer.send('ngx-electron-tray-apply-method', 'setMaxListeners', n);
+        return this;
     }
 
     setPressedImage(image: NativeImage | string): void {
+        this.ipcRenderer.send('ngx-electron-tray-apply-method', 'setPressedImage', image);
     }
 
 }

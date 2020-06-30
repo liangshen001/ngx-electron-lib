@@ -76,7 +76,6 @@ function initTrayListener() {
 
     // 单击菜单
     ipcMain.on('ngx-electron-renderer-set-tray-context-menu', (event, template, timestamp) => {
-        console.log(JSON.stringify(template));
         if (appTray) {
             appTray.setContextMenu(Menu.buildFromTemplate(template.map((currentValue, index) => ({
                 ...currentValue,
@@ -101,7 +100,7 @@ function initTrayListener() {
         appTray.once(eventName, (...margs) => event.sender.send(`ngx-electron-tray-once-${eventName}-${timestamp}`, ...margs)));
 
     ipcMain.on('ngx-electron-tray-apply-method', (event, methodName, ...margs) =>
-        appTray && appTray[methodName](...margs));
+        event.returnValue = appTray && appTray[methodName](...margs));
 
     ipcMain.on('ngx-electron-set-tray-tool-tip', (event, toolTip) => appTray && appTray.setToolTip(toolTip));
 
