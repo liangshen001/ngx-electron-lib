@@ -18,11 +18,11 @@ export class ElectronStore<T> extends Store<T> {
         if (this.electronService.isElectron) {
             const windowsId = this.electronService.electron.remote.getCurrentWindow().id;
             // dispatch action
-            this.electronService.electron.ipcRenderer.on(`ngx-electron-action-shared-${windowsId}`,
+            this.electronService.ipcRenderer.on(`ngx-electron-action-shared-${windowsId}`,
                 (event, action) => this.ngZone.run(() => super.dispatch(action)));
 
             const reduxSynchronizedType = '@ngx-electron/redux init state';
-            this.electronService.electron.ipcRenderer.once(`ngx-electron-synchronized-state`,
+            this.electronService.ipcRenderer.once(`ngx-electron-synchronized-state`,
                 (event, state) => this.ngZone.run(() => {
                     const reducers = (reducerManager as any).reducers;
                     Object.keys(reducers).forEach(key => {
@@ -52,14 +52,14 @@ export class ElectronStore<T> extends Store<T> {
      */
     dispatchToAllWindows<V extends Action = Action>(action: V): void {
         if (this.electronService.isElectron) {
-            const wins = this.electronService.electron.remote.BrowserWindow.getAllWindows();
+            const wins = this.electronService.remote.BrowserWindow.getAllWindows();
             this.dispatchToWindows<V>(action, ...wins);
         }
     }
 
-    dispatchToOpenerWindow<V extends Action = Action>(action: V) {
-        if (this.electronService.isElectron && this.electronService.openerWindowId) {
-            this.dispatchToWindowsByIds(action, this.electronService.openerWindowId);
+    dispatchToOpenerBrowserWindow<V extends Action = Action>(action: V) {
+        if (this.electronService.isElectron && this.electronService.openerBrowserWindow) {
+            this.dispatchToWindows(action, this.electronService.openerBrowserWindow);
         }
     }
 
@@ -82,7 +82,7 @@ export class ElectronStore<T> extends Store<T> {
      */
     dispatchToWindowsByIds<V extends Action = Action>(action: V, ...winIds: number[]): void {
         if (this.electronService.isElectron) {
-            const wins = winIds.map(winId => this.electronService.electron.remote.BrowserWindow.fromId(winId));
+            const wins = winIds.map(winId => this.electronService.remote.BrowserWindow.fromId(winId));
             this.dispatchToWindows<V>(action, ...wins);
         }
     }

@@ -35,8 +35,21 @@ export class Page1IndexComponent implements OnInit {
             take(1)
         ).subscribe(state => {
         });
+        this.electronService.createTray('assets/favicon.ico');
 
-        this.electronService.electron.remote.getCurrentWindow().webContents.openDevTools();
+        this.electronService.tray.on('double-click', () => this.electronService.remote.getCurrentWindow().focus());
+        this.electronService.tray.setContextMenu(this.electronService.remote.Menu.buildFromTemplate([{
+            label: 'test',
+            click: () => {
+                alert(1111);
+            }
+        }, {
+            label: '兰兰'
+        }, {
+            label: '打开设置'
+        }]));
+
+        this.electronService.remote.getCurrentWindow().webContents.openDevTools();
         this.electronService.autoUpdater.checkingForUpdate.subscribe((a) => {
             console.log('checkingForUpdate');
         });

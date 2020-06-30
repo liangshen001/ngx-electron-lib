@@ -1,4 +1,4 @@
-import {ipcMain, Tray, nativeImage, NativeImage, app, Menu} from 'electron';
+import {ipcMain, Tray, nativeImage, NativeImage, app, Menu, BrowserWindow} from 'electron';
 import * as http from 'http';
 import {isMac} from './ngx-electron-main-util';
 import {host, isServe, port} from './ngx-electron-main-args';
@@ -6,30 +6,37 @@ import * as path from 'path';
 
 let appTray: Tray;
 // 得到nativeImage可以是一个网络图片
-function convertImgToNativeImage(imageUrl, isWeb): Promise<NativeImage | string> {
+function convertImgToNativeImage(imageUrl): Promise<NativeImage | string> {
     return new Promise((resolve, reject) => {
-        if (isWeb) {
+        const isWeb = imageUrl.startsWith('http');
+        if (isServe && !isWeb) {
+            imageUrl = `http://${ host }:${ port }/${imageUrl}`;
+        }
+        if (isWeb || isServe) {
             http.get(imageUrl, res => {
                 const chunks = []; // 用于保存网络请求不断加载传输的缓冲数据
                 let size = 0;　　 // 保存缓冲数据的总长度
-                res.on('data', chunk => size += chunk.length);
+                res.on('data', chunk => {
+                    chunks.push(chunk);
+                    size += chunk.length;
+                });
                 res.on('error', reject);
                 res.on('end', err => {
                     // Buffer.concat将chunks数组中的缓冲数据拼接起来，返回一个新的Buffer对象赋值给data
                     const data = Buffer.concat(chunks, size);
                     // 可通过Buffer.isBuffer()方法判断变量是否为一个Buffer对象
-                    console.log(Buffer.isBuffer(data));
                     // 将Buffer对象转换为字符串并以base64编码格式显示
                     const base64Img = data.toString('base64');
                     const array = imageUrl.split('.');
-                    const image = nativeImage.createFromDataURL(
-                        `data:image/${array[array.length - 1]};base64,${base64Img}`);
+                    // ${array[array.length - 1]}
+                    const dataURL = `data:image/png;base64,${base64Img}`;
+                    const image = nativeImage.createFromDataURL(dataURL);
                     resolve(image);
                 });
             });
         } else {
-            const image = nativeImage.createFromDataURL(
-                path.join(app.getAppPath(), 'dist', app.getName(), 'assets', imageUrl));
+            const image = nativeImage.createFromPath(
+                path.join(app.getAppPath(), 'dist', app.getName(), imageUrl));
             resolve(image);
         }
     });
@@ -38,27 +45,32 @@ function convertImgToNativeImage(imageUrl, isWeb): Promise<NativeImage | string>
 /**
  * 创建 tray 对于mac无效果
  * @param imageUrl
- * @param isWeb
  */
-function createTray(imageUrl: string, isWeb = false) {
+function createTray(imageUrl: string) {
     if (isMac()) {
         return null;
     }
-    if (isServe && !isWeb) {
-        imageUrl = `http://${ host }:${ port }/${imageUrl}`;
-    }
-    convertImgToNativeImage(imageUrl, isWeb)
-        .then(image => appTray = new Tray(image));
+    return convertImgToNativeImage(imageUrl)
+        .then(image => {
+            appTray = new Tray(image);
+            BrowserWindow.getAllWindows().forEach(win => win.webContents.send('ngx-electron-main-tray-created'));
+            ipcMain.on('ngx-electron-renderer-tray-created', event => event.returnValue = appTray);
+        });
 }
 
 function initTrayListener() {
 
-    ipcMain.on('ngx-electron-tray-created', event => event.returnValue = appTray);
-
-    ipcMain.on('ngx-electron-set-tray-image', (event, imageUrl, isWeb) => {
+    ipcMain.on('ngx-electron-set-tray-image', (event, imageUrl) => {
         if (appTray) {
-            convertImgToNativeImage(imageUrl, isWeb)
+            convertImgToNativeImage(imageUrl)
                 .then(image => appTray.setImage(image));
+        }
+    });
+    ipcMain.on('ngx-electron-renderer-create-tray', (event, imageUrl) => {
+        if (!appTray) {
+            createTray(imageUrl).then(() => event.returnValue = appTray);
+        } else {
+            event.returnValue = appTray;
         }
     });
 

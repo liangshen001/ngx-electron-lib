@@ -1,6 +1,6 @@
 import {Directive, ElementRef, EventEmitter, HostListener, Input, NgZone, OnInit, Output} from '@angular/core';
 import {ElectronService} from '../electron.service';
-import {MenuItemConstructorOptions} from 'electron';
+import {MenuItemConstructorOptions, Menu, Event} from 'electron';
 
 @Directive({
     selector: '[ngxElectronContextMenus]',
@@ -8,10 +8,31 @@ import {MenuItemConstructorOptions} from 'electron';
 export class NgxElectronContentMenusDirective implements OnInit {
 
     @Input()
-    ngxElectronContextMenus: MenuItemConstructorOptions[];
+    set ngxElectronContextMenus(ngxElectronContextMenus: MenuItemConstructorOptions[]) {
+        ngxElectronContextMenus.forEach(menuItem => {
+            this.changes(menuItem);
+        });
+        this.menu = this.electronService.remote.Menu.buildFromTemplate(ngxElectronContextMenus);
+        this.menu.on('menu-will-close', event => this.ngxElectronMenuWillClose.emit(event));
+        this.menu.on('menu-will-show', event => this.ngxElectronMenuWillShow.emit(event));
+        this.menu.once('menu-will-close', event => this.ngxElectronMenuWillCloseOnce.emit(event));
+        this.menu.once('menu-will-show', event => this.ngxElectronMenuWillShowOnce.emit(event));
+    }
 
     @Output()
-    ngxElectronMenusClosed = new EventEmitter();
+    ngxElectronMenusClosed = new EventEmitter<void>();
+
+    @Output()
+    ngxElectronMenuWillClose = new EventEmitter<Event>();
+
+    @Output()
+    ngxElectronMenuWillShow = new EventEmitter<Event>();
+
+    @Output('ngxElectronMenuWillClose.once')
+    ngxElectronMenuWillCloseOnce = new EventEmitter<Event>();
+
+    @Output('ngxElectronMenuWillShow.once')
+    ngxElectronMenuWillShowOnce = new EventEmitter<Event>();
 
     @Input()
     ngxElectronMenusX: number;
@@ -20,28 +41,21 @@ export class NgxElectronContentMenusDirective implements OnInit {
     @Input()
     ngxElectronPositioningItem: number;
 
+    menu: Menu;
+
     constructor(private element: ElementRef,
                 private electronService: ElectronService,
                 private ngZone: NgZone) {
     }
 
     ngOnInit(): void {
-        // this.element.nativeElement.setAttribute('tabindex', -1);
     }
 
     @HostListener('contextmenu', ['$event'])
     contextmenu(event) {
         event.stopPropagation();
-        if (!this.ngxElectronContextMenus) {
-            return;
-        }
-        const menu = new this.electronService.electron.remote.Menu();
-        this.ngxElectronContextMenus.forEach(menuItem => {
-            this.changes(menuItem);
-            menu.append(new this.electronService.electron.MenuItem(menuItem));
-        });
-        menu.popup({
-            window: this.electronService.electron.remote.getCurrentWindow(),
+        this.menu.popup({
+            window: this.electronService.remote.getCurrentWindow(),
             callback: () => this.ngxElectronMenusClosed.emit(),
             x: this.ngxElectronMenusX,
             y: this.ngxElectronMenusY,
@@ -55,9 +69,9 @@ export class NgxElectronContentMenusDirective implements OnInit {
             return;
         }
         const click = menuItem.click;
-        menuItem.click = () => {
-            this.ngZone.run(() => click());
-        };
+        if (click) {
+            menuItem.click = (...args) => this.ngZone.run(() => click(...args));
+        }
         if (!menuItem.submenu) {
             return;
         }
