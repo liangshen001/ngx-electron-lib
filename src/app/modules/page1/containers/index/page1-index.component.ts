@@ -35,19 +35,6 @@ export class Page1IndexComponent implements OnInit {
             take(1)
         ).subscribe(state => {
         });
-        this.electronService.createTray('assets/favicon.ico');
-
-        this.electronService.tray.on('double-click', () => this.electronService.remote.getCurrentWindow().focus());
-        this.electronService.tray.setContextMenu(this.electronService.remote.Menu.buildFromTemplate([{
-            label: 'test',
-            click: () => {
-                alert(1111);
-            }
-        }, {
-            label: '兰兰'
-        }, {
-            label: '打开设置'
-        }]));
 
         this.electronService.remote.getCurrentWindow().webContents.openDevTools();
         this.electronService.autoUpdater.checkingForUpdate.subscribe((a) => {
@@ -69,11 +56,31 @@ export class Page1IndexComponent implements OnInit {
         this.electronService.autoUpdater.updateDownloateDownloaded.subscribe((a) => {
             alert(a);
         });
+
+        this.electronService.tray.on('double-click', () => this.electronService.remote.getCurrentWindow().focus());
         // const tray = new this.electronService.electron.remote.Tray('');
+    }
+    createTray() {
+        this.electronService.createTray('assets/favicon.ico');
+        this.electronService.tray.setContextMenu(this.electronService.remote.Menu.buildFromTemplate([{
+            label: 'test',
+            click: () => {
+                alert(1111);
+            }
+        }, {
+            label: '兰兰'
+        }, {
+            label: '打开设置'
+        }]));
+    }
+
+    destroyTray() {
+        this.electronService.tray.destroy();
     }
 
     openPage2() {
-        this.electronService.autoUpdater.checkForUpdates();
+        this.electronService.tray.destroy();
+        // this.electronService.autoUpdater.checkForUpdates();
     }
 
     sendData() {

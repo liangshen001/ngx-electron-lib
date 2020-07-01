@@ -5,7 +5,7 @@ let win: BrowserWindow;
 initElectronMainIpcListener('http://127.0.0.1:8889/');
 
 function init() {
-    // createTray('icon/logo.png');
+    // createTray('assets/favicon.ico');
     win = createWindow({
         path: '',
         width: 1024,
