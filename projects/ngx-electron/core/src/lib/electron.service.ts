@@ -90,23 +90,10 @@ export class ElectronService {
         this.electron = (window as any).require('electron');
         this.remote = this.electron.remote;
         this.ipcRenderer = this.electron.ipcRenderer;
+        this.tray = new TrayProxy(this.ipcRenderer, this.remote, this.ngZone);
 
         if (!this.remote.ipcMain.listenerCount('ngx-electron-load-electron-main')) {
             throw new Error('@ngx-electron/main is not imported in electron main');
-        }
-
-        this.ipcRenderer.on('ngx-electron-main-tray-created', () => {
-            if (!this.tray) {
-                this.initTray();
-            }
-        });
-        this.ipcRenderer.on('ngx-electron-main-tray-destroyed', () => {
-            if (this.tray) {
-                this.tray = null;
-            }
-        });
-        if (this.remote.ipcMain.listenerCount('ngx-electron-renderer-tray-created')) {
-            this.initTray();
         }
         this.autoUpdater = new AutoUpdaterProxy(this.ipcRenderer, this.remote);
         this.childProcess = (window as any).require('child_process');
@@ -117,14 +104,6 @@ export class ElectronService {
             const openerWindowId = +this.ipcRenderer.sendSync(`ngx-electron-renderer-win-initialized-${winId}`);
             this.openerBrowserWindow = this.remote.BrowserWindow.fromId(openerWindowId);
         }
-    }
-    createTray(image) {
-        this.ipcRenderer.sendSync('ngx-electron-renderer-create-tray', image);
-        this.initTray();
-        return this.tray;
-    }
-    private initTray() {
-        this.tray = new TrayProxy(this.ipcRenderer, this.remote, this.ngZone);
     }
 
     sendDataToWindowsByKeys<T>(data: T, ...keys: string[]) {

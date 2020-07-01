@@ -43,40 +43,34 @@ function convertImgToNativeImage(imageUrl): Promise<NativeImage | string> {
 }
 
 /**
- * 创建 tray 对于mac无效果
+ * 创建 tray
  * @param imageUrl
  */
 function createTray(imageUrl: string) {
-    if (isMac()) {
-        return null;
-    }
     return convertImgToNativeImage(imageUrl)
         .then(image => {
             appTray = new Tray(image);
-            BrowserWindow.getAllWindows().forEach(win => win.webContents.send('ngx-electron-main-tray-created'));
-            ipcMain.on('ngx-electron-renderer-tray-created', event => event.returnValue = appTray);
         });
 }
 
 function initTrayListener() {
 
     ipcMain.on('ngx-electron-set-tray-image', (event, imageUrl) => {
-        if (appTray) {
+        if (appTray && !appTray.isDestroyed()) {
             convertImgToNativeImage(imageUrl)
                 .then(image => appTray.setImage(image));
         }
     });
     ipcMain.on('ngx-electron-renderer-create-tray', (event, imageUrl) => {
-        if (!appTray) {
-            createTray(imageUrl).then(() => event.returnValue = appTray);
-        } else {
-            event.returnValue = appTray;
+        if (appTray && !appTray.isDestroyed()) {
+            appTray.destroy();
         }
+        createTray(imageUrl).then(() => event.returnValue = appTray);
     });
 
     // 单击菜单
     ipcMain.on('ngx-electron-renderer-set-tray-context-menu', (event, template, timestamp) => {
-        if (appTray) {
+        if (appTray && !appTray.isDestroyed()) {
             appTray.setContextMenu(Menu.buildFromTemplate(template.map((currentValue, index) => ({
                 ...currentValue,
                 click: () => event.sender.send(`ngx-electron-click-tray-context-menu-item-${timestamp}`, index)
@@ -85,7 +79,7 @@ function initTrayListener() {
     });
 
     ipcMain.on('ngx-electron-tray-on-event', (event, eventName, timestamp) => {
-        if (appTray) {
+        if (appTray && !appTray.isDestroyed()) {
             appTray.on(eventName, (...margs) => {
                 try {
                     event.sender.send(`ngx-electron-tray-on-${eventName}-${timestamp}`, ...margs);
@@ -97,12 +91,11 @@ function initTrayListener() {
     });
 
     ipcMain.on('ngx-electron-tray-once-event', (event, eventName, timestamp) =>
+        appTray && !appTray.isDestroyed() &&
         appTray.once(eventName, (...margs) => event.sender.send(`ngx-electron-tray-once-${eventName}-${timestamp}`, ...margs)));
 
     ipcMain.on('ngx-electron-tray-apply-method', (event, methodName, ...margs) =>
-        event.returnValue = appTray && appTray[methodName](...margs));
-
-    ipcMain.on('ngx-electron-set-tray-tool-tip', (event, toolTip) => appTray && appTray.setToolTip(toolTip));
+        event.returnValue = !!appTray && !appTray.isDestroyed() && appTray[methodName](...margs));
 
 }
 

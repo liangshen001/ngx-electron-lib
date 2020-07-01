@@ -54,21 +54,25 @@ export class TrayProxy implements Tray {
     constructor(private ipcRenderer: IpcRenderer, private remote: Remote, private ngZone: NgZone) {
     }
 
+    create(image): void {
+        this.ipcRenderer.sendSync('ngx-electron-renderer-create-tray', image);
+    }
+
     destroy(): void {
-        this.ipcRenderer.send('ngx-electron-tray-apply-method', 'destroy');
+        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'destroy');
     }
 
     on(event: any, listener: any): this {
         const timestamp = new Date().getTime();
         this.ipcRenderer.on(`ngx-electron-tray-on-${event}-${timestamp}`, listener);
-        this.ipcRenderer.send(`ngx-electron-tray-on-event`, event, timestamp);
+        this.ipcRenderer.sendSync(`ngx-electron-tray-on-event`, event, timestamp);
         return this;
     }
 
     once(event, listener): this {
         const timestamp = new Date().getTime();
         this.ipcRenderer.on(`ngx-electron-tray-once-${event}-${timestamp}`, listener);
-        this.ipcRenderer.send(`ngx-electron-tray-once-event`, event, timestamp);
+        this.ipcRenderer.sendSync(`ngx-electron-tray-once-event`, event, timestamp);
         return this;
     }
 
@@ -79,27 +83,24 @@ export class TrayProxy implements Tray {
             this.ngZone.run(() => setTimeout(() =>
                 item.click && item.click(null, null, null)));
         });
-        this.ipcRenderer.send('ngx-electron-renderer-set-tray-context-menu', menu.items, timestamp);
+        this.ipcRenderer.sendSync('ngx-electron-renderer-set-tray-context-menu', menu.items, timestamp);
     }
 
     setImage(image: NativeImage | string): void {
-        this.ipcRenderer.send('ngx-electron-tray-apply-method', 'setImage', image);
+        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setImage', image);
     }
 
     setTitle(title: string): void {
-        this.ipcRenderer.send('ngx-electron-tray-apply-method', 'setTitle', title);
+        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setTitle', title);
     }
 
     setToolTip(toolTip: string): void {
-        this.ipcRenderer.send('ngx-electron-tray-apply-method', 'setToolTip', toolTip);
+        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setToolTip', toolTip);
     }
 
     /***************************/
     addListener(event: any, listener: any): this {
-        const timestamp = new Date().getTime();
-        this.ipcRenderer.on(`ngx-electron-tray-on-${event}-${timestamp}`, listener);
-        this.ipcRenderer.send(`ngx-electron-tray-on-event`, event, timestamp);
-        return this;
+        return this.on(event, listener);
     }
 
     displayBalloon(options: DisplayBalloonOptions): void {
@@ -167,12 +168,12 @@ export class TrayProxy implements Tray {
     }
 
     setMaxListeners(n: number): this {
-        this.ipcRenderer.send('ngx-electron-tray-apply-method', 'setMaxListeners', n);
+        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setMaxListeners', n);
         return this;
     }
 
     setPressedImage(image: NativeImage | string): void {
-        this.ipcRenderer.send('ngx-electron-tray-apply-method', 'setPressedImage', image);
+        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setPressedImage', image);
     }
 
 }
