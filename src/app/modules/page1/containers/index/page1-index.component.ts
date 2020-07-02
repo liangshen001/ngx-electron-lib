@@ -60,16 +60,8 @@ export class Page1IndexComponent implements OnInit {
         this.electronService.tray.on('double-click', () => this.electronService.remote.getCurrentWindow().focus());
         // const tray = new this.electronService.electron.remote.Tray('');
     }
-
-    test() {
-        const a = () => {};
-        a.b = 123;
-        this.electronService.ipcRenderer.send('test-test', a);
-    }
-
     createTray() {
-        this.electronService.tray.create('assets/favicon.ico');
-        this.electronService.tray.create('assets/favicon.ico');
+        this.electronService.createTray('assets/favicon.ico');
         this.electronService.tray.setContextMenu(this.electronService.remote.Menu.buildFromTemplate([{
             label: 'test',
             click: () => {

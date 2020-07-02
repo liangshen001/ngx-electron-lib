@@ -1,4 +1,4 @@
-import {app, BrowserWindow, ipcMain} from 'electron';
+import {app, BrowserWindow} from 'electron';
 import {createTray, createWindow, initElectronMainIpcListener, isMac} from '@ngx-electron/main';
 
 let win: BrowserWindow;
@@ -20,10 +20,6 @@ function init() {
     });
     win.on('close', () => app.quit());
 }
-
-// ipcMain.on('test-test', (a) => {
-//     console.log(a);
-// });
 
 
 // This method will be called when Electron has finished
