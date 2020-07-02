@@ -21,9 +21,9 @@ function init() {
     win.on('close', () => app.quit());
 }
 
-// ipcMain.on('test-test', (a) => {
-//     console.log(a);
-// });
+ipcMain.on('test-test', (e, a) => {
+    console.log(a);
+});
 
 
 // This method will be called when Electron has finished

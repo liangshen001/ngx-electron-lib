@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { v4 as uuidv4 } from 'uuid';
 import {IpcRenderer} from 'electron';
 
 
@@ -83,7 +83,7 @@ export class IpcRendererProxy implements IpcRenderer {
     }
 
     send(channel: string, ...args: any[]): void {
-        this.listenerCallback(args);
+        this.registryCallbackFunction(args);
         this.ipcRenderer.send(channel, ...args);
     }
 
@@ -104,15 +104,21 @@ export class IpcRendererProxy implements IpcRenderer {
         return this;
     }
 
-    listenerCallback(obj: any) {
+    registryCallbackFunction(obj: any): any {
         if (obj instanceof Function) {
-
+            const uuid = uuidv4();
+            this.ipcRenderer.sendSync('ngx-electron-renderer-registry-callback-function', uuid);
+            return {
+                type: 'ngx-electron-callback-function',
+                id: uuid
+            };
         } else if (obj instanceof Array) {
-            obj.forEach(o => this.listenerCallback(o));
+            return obj.map(o => this.registryCallbackFunction(o));
         } else if (obj instanceof Object) {
             for (const key of Object.keys(obj)) {
-
+                obj[key] = this.registryCallbackFunction(obj[key]);
             }
+            return obj;
         }
     }
 

@@ -36,7 +36,7 @@ export class Page1IndexComponent implements OnInit {
         ).subscribe(state => {
         });
 
-        this.electronService.remote.getCurrentWindow().webContents.openDevTools();
+        // this.electronService.remote.getCurrentWindow().webContents.openDevTools();
         this.electronService.autoUpdater.checkingForUpdate.subscribe((a) => {
             console.log('checkingForUpdate');
         });
@@ -57,12 +57,12 @@ export class Page1IndexComponent implements OnInit {
             alert(a);
         });
 
-        this.electronService.tray.on('double-click', () => this.electronService.remote.getCurrentWindow().focus());
+        // this.electronService.tray.on('double-click', () => this.electronService.remote.getCurrentWindow().focus());
         // const tray = new this.electronService.electron.remote.Tray('');
     }
 
     test() {
-        const a = () => {};
+        const a: any = {};
         a.b = 123;
         this.electronService.ipcRenderer.send('test-test', a);
     }
