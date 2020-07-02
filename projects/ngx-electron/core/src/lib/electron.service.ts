@@ -1,18 +1,14 @@
 import {Injectable, NgZone} from '@angular/core';
 import {Router} from '@angular/router';
-import {concat, Observable, Subject} from 'rxjs';
+import {Observable} from 'rxjs';
 import {
     BrowserWindow,
     BrowserWindowConstructorOptions,
-    MenuItemConstructorOptions,
-    RendererInterface,
-    Remote,
     IpcMainEvent,
     IpcRenderer,
     IpcRendererEvent,
-    Rectangle,
-    Point,
-    Tray
+    Remote,
+    RendererInterface
 } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
@@ -20,6 +16,7 @@ import * as url from 'url';
 import * as path from 'path';
 import {TrayProxy} from './tray-proxy';
 import {AutoUpdaterProxy} from './auto-updater-proxy';
+import {IpcRendererProxy} from './ipc-callback.service';
 
 export type BrowserWindowOptions =
     BrowserWindowConstructorOptions
@@ -31,13 +28,14 @@ export type BrowserWindowOptions =
     providedIn: 'root'
 })
 export class ElectronService {
+
     openerBrowserWindow?: BrowserWindow;
 
     electron?: RendererInterface;
 
     remote?: Remote;
 
-    ipcRenderer?: IpcRenderer;
+    ipcRenderer?: IpcRendererProxy;
 
     childProcess?: typeof childProcess;
     fs?: typeof fs;
@@ -89,7 +87,7 @@ export class ElectronService {
         }
         this.electron = (window as any).require('electron');
         this.remote = this.electron.remote;
-        this.ipcRenderer = this.electron.ipcRenderer;
+        this.ipcRenderer = new IpcRendererProxy(this.electron.ipcRenderer);
         this.tray = new TrayProxy(this.ipcRenderer, this.remote, this.ngZone);
 
         if (!this.remote.ipcMain.listenerCount('ngx-electron-load-electron-main')) {

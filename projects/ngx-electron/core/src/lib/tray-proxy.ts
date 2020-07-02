@@ -59,52 +59,60 @@ export class TrayProxy implements Tray {
     }
 
     destroy(): void {
-        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'destroy');
-    }
-
-    on(event: any, listener: any): this {
-        const timestamp = new Date().getTime();
-        this.ipcRenderer.on(`ngx-electron-tray-on-${event}-${timestamp}`, listener);
-        this.ipcRenderer.sendSync(`ngx-electron-tray-on-event`, event, timestamp);
-        return this;
-    }
-
-    once(event, listener): this {
-        const timestamp = new Date().getTime();
-        this.ipcRenderer.on(`ngx-electron-tray-once-${event}-${timestamp}`, listener);
-        this.ipcRenderer.sendSync(`ngx-electron-tray-once-event`, event, timestamp);
-        return this;
+        if (this.isDestroyed()) {
+            this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'destroy');
+        }
     }
 
     setContextMenu(menu: Menu | null): void {
-        const timestamp = new Date().getTime();
-        this.ipcRenderer.on(`ngx-electron-click-tray-context-menu-item-${timestamp}`, (event, i) => {
-            const item = menu.items.find((value, index) => index === i);
-            this.ngZone.run(() => setTimeout(() =>
-                item.click && item.click(null, null, null)));
-        });
-        this.ipcRenderer.sendSync('ngx-electron-renderer-set-tray-context-menu', menu.items, timestamp);
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        } else {
+            const timestamp = new Date().getTime();
+            this.ipcRenderer.on(`ngx-electron-click-tray-context-menu-item-${timestamp}`, (event, i) => {
+                const item = menu.items.find((value, index) => index === i);
+                this.ngZone.run(() => setTimeout(() => {
+                    if (item.click) {
+                        item.click(null, null, null);
+                    }
+                }));
+            });
+            this.ipcRenderer.sendSync('ngx-electron-renderer-set-tray-context-menu', menu.items, timestamp);
+        }
     }
 
     setImage(image: NativeImage | string): void {
-        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setImage', image);
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        } else {
+            this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setImage', image);
+        }
     }
 
     setTitle(title: string): void {
-        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setTitle', title);
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        } else {
+            this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setTitle', title);
+        }
     }
 
     setToolTip(toolTip: string): void {
-        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setToolTip', toolTip);
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        } else {
+            this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setToolTip', toolTip);
+        }
     }
 
     /***************************/
-    addListener(event: any, listener: any): this {
-        return this.on(event, listener);
-    }
 
     displayBalloon(options: DisplayBalloonOptions): void {
-        this.ipcRenderer.send('ngx-electron-tray-apply-method', 'displayBalloon', options);
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        } else {
+            this.ipcRenderer.send('ngx-electron-tray-apply-method', 'displayBalloon', options);
+        }
     }
 
     emit(event: string | symbol, ...args: any[]): boolean {
@@ -112,22 +120,43 @@ export class TrayProxy implements Tray {
     }
 
     eventNames(): Array<string | symbol> {
-        return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'eventNames');
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+            return null;
+        } else {
+            return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'eventNames');
+        }
     }
 
     getBounds(): Rectangle {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+            return null;
+        }
         return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'getBounds');
     }
 
     getIgnoreDoubleClickEvents(): boolean {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+            return null;
+        }
         return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'getIgnoreDoubleClickEvents');
     }
 
     getMaxListeners(): number {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+            return null;
+        }
         return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'getMaxListeners');
     }
 
     getTitle(): string {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+            return null;
+        }
         return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'getTitle');
     }
 
@@ -136,14 +165,47 @@ export class TrayProxy implements Tray {
     }
 
     listenerCount(type: string | symbol): number {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+            return null;
+        }
         return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'listenerCount', type);
     }
 
     listeners(event: string | symbol): [] {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+            return null;
+        }
         return this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'listeners', event);
     }
 
     popUpContextMenu(menu?: Menu, position?: Point): void {
+    }
+
+    setIgnoreDoubleClickEvents(ignore: boolean): void {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        } else {
+            this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setIgnoreDoubleClickEvents', ignore);
+        }
+    }
+
+    setPressedImage(image: NativeImage | string): void {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        } else {
+            this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setPressedImage', image);
+        }
+    }
+
+    setMaxListeners(n: number): this {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        } else {
+            this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setMaxListeners', n);
+        }
+        return this;
     }
 
     prependListener(event: string | symbol, listener: (...args: any[]) => void): this {
@@ -155,25 +217,40 @@ export class TrayProxy implements Tray {
     }
 
     removeAllListeners(event?: string | symbol): this {
-        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'removeAllListeners', event);
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        } else {
+            this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'removeAllListeners', event);
+        }
         return this;
     }
 
     removeListener(event: any, listener: any): this {
         return this;
     }
-
-    setIgnoreDoubleClickEvents(ignore: boolean): void {
-        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setIgnoreDoubleClickEvents', ignore);
+    addListener(event: any, listener: any): this {
+        return this.on(event, listener);
     }
 
-    setMaxListeners(n: number): this {
-        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setMaxListeners', n);
+    on(event: any, listener: any): this {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        }
+        const timestamp = new Date().getTime();
+        this.ipcRenderer.on(`ngx-electron-tray-on-${event}-${timestamp}`, listener);
+        this.ipcRenderer.sendSync(`ngx-electron-tray-on-event`, event, timestamp);
         return this;
     }
 
-    setPressedImage(image: NativeImage | string): void {
-        this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'setPressedImage', image);
+    once(event, listener): this {
+        if (this.isDestroyed()) {
+            console.warn('Tray has been destroyed');
+        } else {
+            const timestamp = new Date().getTime();
+            this.ipcRenderer.on(`ngx-electron-tray-once-${event}-${timestamp}`, listener);
+            this.ipcRenderer.sendSync(`ngx-electron-tray-once-event`, event, timestamp);
+        }
+        return this;
     }
 
 }
