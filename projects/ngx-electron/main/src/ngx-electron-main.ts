@@ -18,5 +18,6 @@ function initElectronMainIpcListener(options?: PublishConfiguration | AllPublish
     }
 }
 
+
 export {initElectronMainIpcListener};
 

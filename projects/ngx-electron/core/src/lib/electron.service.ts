@@ -16,7 +16,7 @@ import * as url from 'url';
 import * as path from 'path';
 import {TrayProxy} from './tray-proxy';
 import {AutoUpdaterProxy} from './auto-updater-proxy';
-import {IpcRendererProxy} from './ipc-callback.service';
+import {IpcRendererProxy} from './ipc-renderer-proxy';
 
 export type BrowserWindowOptions =
     BrowserWindowConstructorOptions
@@ -87,8 +87,8 @@ export class ElectronService {
         }
         this.electron = (window as any).require('electron');
         this.remote = this.electron.remote;
-        this.ipcRenderer = new IpcRendererProxy(this.electron.ipcRenderer);
-        this.tray = new TrayProxy(this.ipcRenderer, this.remote, this.ngZone);
+        this.ipcRenderer = new IpcRendererProxy(this.electron.ipcRenderer, this.ngZone);
+        this.tray = new TrayProxy(this.electron, this.ipcRenderer, this.remote, this.ngZone);
 
         if (!this.remote.ipcMain.listenerCount('ngx-electron-load-electron-main')) {
             throw new Error('@ngx-electron/main is not imported in electron main');

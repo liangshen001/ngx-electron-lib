@@ -1,15 +1,42 @@
 import { v4 as uuidv4 } from 'uuid';
 import {IpcRenderer} from 'electron';
+import {NgZone} from '@angular/core';
+import {global} from '@angular/compiler/src/util';
 
+
+const proxy_set = new WeakSet();
+global.Proxy = new Proxy(Proxy, {
+    construct(target, args: any) {
+        // @ts-ignore
+        const proxy = new target(...args);
+        proxy_set.add(proxy);
+        return proxy;
+    }
+});
 
 export class IpcRendererProxy implements IpcRenderer {
 
     /**
      * 用于存放渲染进程中的回调 对应的 channel
      */
-    private callbackMap = new Map<Function, string>();
+    private callbackMap = new Map<string, Function>();
 
-    constructor(private ipcRenderer: IpcRenderer) {
+    private mainCallbackMap = new Map<string, Function>();
+
+    constructor(private ipcRenderer: IpcRenderer, private ngZone: NgZone) {
+        this.on('ngx-electron-main-execute-callback', (event, callbackId, ...args) => {
+            const value = this.callbackMap.get(callbackId);
+            value(...args);
+            event.returnValue = null;
+
+        });
+        this.on('ngx-electron-main-registry-callback', (event, callbackId) => {
+            this.mainCallbackMap.set(callbackId, () => {
+                console.log(222222);
+                event.sender.send('ngx-electron-renderer-execute-callback', callbackId);
+            });
+            event.returnValue = null;
+        });
     }
 
     addListener(event: string | symbol, listener: (...args: any[]) => void): this {
@@ -45,7 +72,20 @@ export class IpcRendererProxy implements IpcRenderer {
     on(event: string | symbol, listener: (...args: any[]) => void): this;
     on(channel: string, listener: ((event: Electron.IpcRendererEvent, ...args: any[]) => void)
         | ((...args: any[]) => void)): this {
-        this.ipcRenderer.on(channel, listener);
+        this.ipcRenderer.on(channel, (event, ...args) => {
+            const send = event.sender.send;
+            const sendSync = event.sender.sendSync;
+            event.sender.send = (...args2) => {
+                args2 = this.registryCallback(args2);
+                send.call(event.sender, ...args2);
+            };
+            event.sender.sendSync = (...args2) => {
+                args2 = this.registryCallback(args2);
+                sendSync.call(event.sender, ...args2);
+            };
+            args = this.analysisCallback(args);
+            listener(event, ...args);
+        });
         return this;
     }
 
@@ -83,19 +123,23 @@ export class IpcRendererProxy implements IpcRenderer {
     }
 
     send(channel: string, ...args: any[]): void {
-        this.registryCallbackFunction(args);
+        args = this.registryCallback(args);
+        console.log(args);
         this.ipcRenderer.send(channel, ...args);
     }
 
     sendSync(channel: string, ...args: any[]): any {
+        args = this.registryCallback(args);
         this.ipcRenderer.sendSync(channel, ...args);
     }
 
     sendTo(webContentsId: number, channel: string, ...args: any[]): void {
+        args = this.registryCallback(args);
         this.ipcRenderer.sendTo(webContentsId, channel, ...args);
     }
 
     sendToHost(channel: string, ...args: any[]): void {
+        args = this.registryCallback(args);
         this.ipcRenderer.sendToHost(channel, ...args);
     }
 
@@ -104,22 +148,53 @@ export class IpcRendererProxy implements IpcRenderer {
         return this;
     }
 
-    registryCallbackFunction(obj: any): any {
+    private registryCallback(obj: any, objs = []): any {
+        if (proxy_set.has(obj) || objs.includes(obj)) {
+            return null;
+        }
+        objs.push(obj);
         if (obj instanceof Function) {
-            const uuid = uuidv4();
-            this.ipcRenderer.sendSync('ngx-electron-renderer-registry-callback-function', uuid);
+            const callbackId = uuidv4();
+            this.callbackMap.set(callbackId, (...args) => this.ngZone.run(() => setTimeout(() => obj(...args))));
+            this.send('ngx-electron-renderer-registry-callback', callbackId);
             return {
-                type: 'ngx-electron-callback-function',
-                id: uuid
+                type: 'ngx-electron-callback',
+                id: callbackId
             };
         } else if (obj instanceof Array) {
-            return obj.map(o => this.registryCallbackFunction(o));
+            return obj.map(o => this.registryCallback(o, objs));
         } else if (obj instanceof Object) {
             for (const key of Object.keys(obj)) {
-                obj[key] = this.registryCallbackFunction(obj[key]);
+                if (obj[key] instanceof Function) {
+                    obj[key] = this.registryCallback(obj[key], objs);
+                } else {
+                    this.registryCallback(obj[key], objs);
+                }
             }
-            return obj;
         }
+        return obj;
+    }
+
+    private analysisCallback(obj, objs = []) {
+        if (objs.includes(obj)) {
+            return null;
+        }
+        objs.push(obj);
+        if (obj instanceof Array) {
+            return obj.map(o => this.analysisCallback(o, objs));
+        } else if (obj instanceof Object) {
+            if (obj.type === 'ngx-electron-callback') {
+                return this.mainCallbackMap.get(obj.id);
+            }
+            for (const key of Object.keys(obj)) {
+                if (obj[key] instanceof Object && obj[key].type === 'ngx-electron-callback') {
+                    obj[key] = this.analysisCallback(obj[key], objs);
+                } else {
+                    this.analysisCallback(obj[key], objs);
+                }
+            }
+        }
+        return obj;
     }
 
 

@@ -1,6 +1,6 @@
 import {ipcMain, Tray, nativeImage, NativeImage, app, Menu, BrowserWindow} from 'electron';
 import * as http from 'http';
-import {isMac} from './ngx-electron-main-util';
+import {ipcMainProxy, isMac} from './ngx-electron-main-util';
 import {host, isServe, port} from './ngx-electron-main-args';
 import * as path from 'path';
 
@@ -44,7 +44,7 @@ function convertImgToNativeImage(imageUrl): Promise<NativeImage | string> {
 
 /**
  * 创建 tray
- * @param imageUrl
+ * @param imageUrl imageUrl
  */
 function createTray(imageUrl: string) {
     return convertImgToNativeImage(imageUrl)
@@ -76,6 +76,13 @@ function initTrayListener() {
                 click: () => event.sender.send(`ngx-electron-click-tray-context-menu-item-${timestamp}`, index)
             }))));
         }
+    });
+    // 单击菜单
+    ipcMainProxy.on('ngx-electron-renderer-set-tray-menu-items', (event, template) => {
+        if (appTray && !appTray.isDestroyed()) {
+            appTray.setContextMenu(Menu.buildFromTemplate(template));
+        }
+        event.returnValue = null;
     });
 
     ipcMain.on('ngx-electron-tray-on-event', (event, eventName, timestamp) => {

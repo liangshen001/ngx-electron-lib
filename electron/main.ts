@@ -1,5 +1,5 @@
-import {app, BrowserWindow, ipcMain} from 'electron';
-import {createTray, createWindow, initElectronMainIpcListener, isMac} from '@ngx-electron/main';
+import {app, BrowserWindow, ipcMain, Tray} from 'electron';
+import {createTray, createWindow, initElectronMainIpcListener, isMac, ipcMainProxy} from '@ngx-electron/main';
 
 let win: BrowserWindow;
 initElectronMainIpcListener('http://127.0.0.1:8889/');
@@ -21,8 +21,15 @@ function init() {
     win.on('close', () => app.quit());
 }
 
-ipcMain.on('test-test', (e, a) => {
-    console.log(a);
+ipcMainProxy.on('ngx-electron-renderer-set-tray-menu', (e, a) => {
+    const tray = new Tray('/Users/wangliang/WebstormProjects/ngx-electron-lib/src/assets/favicon.ico');
+    console.log(a[0].click);
+    tray.setContextMenu(a);
+    // tray.setContextMenu(a);
+});
+
+ipcMainProxy.on('test-test', (e, a) => {
+    a.test();
 });
 
 

@@ -1,6 +1,7 @@
-import {IpcRenderer, Remote, Tray, Menu, NativeImage, DisplayBalloonOptions, Rectangle, Point} from 'electron';
+import {IpcRenderer, Remote, Tray, Menu, NativeImage, DisplayBalloonOptions, Rectangle, Point, RendererInterface} from 'electron';
 import {Injectable, NgZone} from '@angular/core';
 import {Observable} from 'rxjs';
+import {IpcRendererProxy} from './ipc-renderer-proxy';
 
 
 export class TrayProxy implements Tray {
@@ -51,7 +52,8 @@ export class TrayProxy implements Tray {
         this.on('right-click', () => subscriber.next());
     });
 
-    constructor(private ipcRenderer: IpcRenderer, private remote: Remote, private ngZone: NgZone) {
+    constructor(private electron: RendererInterface, private ipcRenderer: IpcRendererProxy,
+                private remote: Remote, private ngZone: NgZone) {
     }
 
     create(image): void {
@@ -68,16 +70,21 @@ export class TrayProxy implements Tray {
         if (this.isDestroyed()) {
             console.warn('Tray has been destroyed');
         } else {
-            const timestamp = new Date().getTime();
-            this.ipcRenderer.on(`ngx-electron-click-tray-context-menu-item-${timestamp}`, (event, i) => {
-                const item = menu.items.find((value, index) => index === i);
-                this.ngZone.run(() => setTimeout(() => {
-                    if (item.click) {
-                        item.click(null, null, null);
-                    }
-                }));
-            });
-            this.ipcRenderer.sendSync('ngx-electron-renderer-set-tray-context-menu', menu.items, timestamp);
+            // const timestamp = new Date().getTime();
+            // this.ipcRenderer.on(`ngx-electron-click-tray-context-menu-item-${timestamp}`, (event, i) => {
+            //     const item = menu.items.find((value, index) => index === i);
+            //     this.ngZone.run(() => setTimeout(() => {
+            //         if (item.click) {
+            //             item.click(null, null, null);
+            //         }
+            //     }));
+            // });
+            // this.ipcRenderer.sendSync('ngx-electron-renderer-set-tray-context-menu', menu.items, timestamp);
+            // this.ipcRenderer.sendSync('ngx-electron-renderer-set-tray-context-menu', menu.items.map(item => ({
+            //     ...this.electron.ipcRenderer.sendSync('ngx-electron-renderer-json-parse', item),
+            //     click: item.click
+            // })));
+            this.ipcRenderer.sendSync('ngx-electron-renderer-set-tray-menu-items', menu.items);
         }
     }
 
