@@ -78,10 +78,6 @@ export class Page1IndexComponent implements OnInit {
             click: () => {
                 alert(1111);
             }
-        }, {
-            label: '兰兰'
-        }, {
-            label: '打开设置'
         }]));
 
         // this.electronService.ipcRenderer.sendSync('ngx-electron-renderer-set-tray-menu-items', [{

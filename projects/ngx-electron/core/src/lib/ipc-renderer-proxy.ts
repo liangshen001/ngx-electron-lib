@@ -19,9 +19,10 @@ export class IpcRendererProxy implements IpcRenderer {
     /**
      * 用于存放渲染进程中的回调 对应的 channel
      */
-    private callbackMap = new Map<string, Function>();
+    private callbackMap = new WeakMap<String, Function>();
+    private callbackMap2 = new WeakMap<Function, string>();
 
-    private mainCallbackMap = new Map<string, Function>();
+    private mainCallbackMap = new WeakMap<String, Function>();
 
     constructor(private ipcRenderer: IpcRenderer, private ngZone: NgZone) {
         this.on('ngx-electron-main-execute-callback', (event, callbackId, ...args) => {
@@ -32,7 +33,6 @@ export class IpcRendererProxy implements IpcRenderer {
         });
         this.on('ngx-electron-main-registry-callback', (event, callbackId) => {
             this.mainCallbackMap.set(callbackId, () => {
-                console.log(222222);
                 event.sender.send('ngx-electron-renderer-execute-callback', callbackId);
             });
             event.returnValue = null;
@@ -154,9 +154,15 @@ export class IpcRendererProxy implements IpcRenderer {
         }
         objs.push(obj);
         if (obj instanceof Function) {
-            const callbackId = uuidv4();
-            this.callbackMap.set(callbackId, (...args) => this.ngZone.run(() => setTimeout(() => obj(...args))));
-            this.send('ngx-electron-renderer-registry-callback', callbackId);
+            let callbackId = uuidv4();
+            if (this.callbackMap2.has(obj)) {
+                callbackId = this.callbackMap2.get(obj);
+            } else {
+                callbackId = uuidv4();
+                this.callbackMap2.set(obj, callbackId);
+                this.callbackMap.set(callbackId, (...args) => this.ngZone.run(() => setTimeout(() => obj(...args))));
+                this.send('ngx-electron-renderer-registry-callback', callbackId);
+            }
             return {
                 type: 'ngx-electron-callback',
                 id: callbackId

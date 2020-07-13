@@ -84,23 +84,6 @@ function initTrayListener() {
         }
         event.returnValue = null;
     });
-
-    ipcMain.on('ngx-electron-tray-on-event', (event, eventName, timestamp) => {
-        if (appTray && !appTray.isDestroyed()) {
-            appTray.on(eventName, (...margs) => {
-                try {
-                    event.sender.send(`ngx-electron-tray-on-${eventName}-${timestamp}`, ...margs);
-                } catch (e) {
-
-                }
-            });
-        }
-    });
-
-    ipcMain.on('ngx-electron-tray-once-event', (event, eventName, timestamp) =>
-        appTray && !appTray.isDestroyed() &&
-        appTray.once(eventName, (...margs) => event.sender.send(`ngx-electron-tray-once-${eventName}-${timestamp}`, ...margs)));
-
     ipcMain.on('ngx-electron-tray-apply-method', (event, methodName, ...margs) =>
         event.returnValue = !!appTray && !appTray.isDestroyed() && appTray[methodName](...margs));
 
