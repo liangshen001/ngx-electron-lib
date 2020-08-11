@@ -1,4 +1,4 @@
-import {ipcMain, Tray, nativeImage, NativeImage, app, Menu, BrowserWindow} from 'electron';
+import {ipcMain, Tray, nativeImage, NativeImage, app, Menu, MenuItemConstructorOptions} from 'electron';
 import * as http from 'http';
 import {ipcMainProxy, isMac} from './ngx-electron-main-util';
 import {host, isServe, port} from './ngx-electron-main-args';
@@ -78,8 +78,13 @@ function initTrayListener() {
         }
     });
     // 单击菜单
-    ipcMainProxy.on('ngx-electron-renderer-set-tray-menu-items', (event, template) => {
+    ipcMainProxy.on('ngx-electron-renderer-set-tray-menu-items', (event, template: any[]) => {
         if (appTray && !appTray.isDestroyed()) {
+            // const click: any = template[0].click;
+            // template[0].click = () => {
+            //     console.log(click);
+            //     click();
+            // };
             appTray.setContextMenu(Menu.buildFromTemplate(template));
         }
         event.returnValue = null;

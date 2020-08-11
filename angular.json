@@ -66,7 +66,7 @@
           }
         },
         "serve": {
-          "builder": "@ngx-electron/builder:dev-serve",
+          "builder": "@ngx-electron/builder:dev-server",
           "options": {
             "browserTarget": "ngx-electron-lib:build",
               "port": 8080

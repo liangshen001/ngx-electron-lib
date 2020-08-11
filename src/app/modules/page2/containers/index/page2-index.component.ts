@@ -10,7 +10,6 @@ import {map} from 'rxjs/operators';
 export class Page2IndexComponent implements OnInit {
     title = 'page2';
 
-
     data$: Observable<string>;
 
     constructor(private electronService: ElectronService) {}

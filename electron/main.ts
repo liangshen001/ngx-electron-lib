@@ -21,9 +21,8 @@ function init() {
     win.on('close', () => app.quit());
 }
 
-ipcMainProxy.on('ngx-electron-renderer-set-tray-menu', (e, a) => {
-    const tray = new Tray('/Users/wangliang/WebstormProjects/ngx-electron-lib/src/assets/favicon.ico');
-    console.log(a[0].click);
+ipcMainProxy.on('ngx-electron-renderer-set-tray-menu2', (e, a) => {
+    const tray = new Tray('F:/WebStorm/workspace/ngx-electron-lib/src/assets/favicon.ico');
     tray.setContextMenu(a);
     // tray.setContextMenu(a);
 });

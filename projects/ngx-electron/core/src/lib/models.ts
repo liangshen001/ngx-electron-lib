@@ -16,21 +16,30 @@ export interface TrayProxy {
 
     on(event: 'double-click', listener: (event: Event,
                                          bounds: Rectangle) => void);
+
     once(event: 'double-click', listener: (event: Event,
-                                         bounds: Rectangle) => void);
+                                           bounds: Rectangle) => void);
+
     on(event: 'drop-files', listener: (event: Event,
                                        files: string[]) => void);
+
     once(event: 'drop-files', listener: (event: Event,
-                                       files: string[]) => void);
+                                         files: string[]) => void);
+
     on(event: 'drop-text', listener: (event: Event,
                                       text: string) => void);
+
     once(event: 'drop-text', listener: (event: Event,
-                                      text: string) => void);
+                                        text: string) => void);
+
     on(event: 'mouse-enter' | 'mouse-leave' | 'mouse-move' | 'right-click', listener: (event: Event,
-                                                        position: Point) => void);
+                                                                                       position: Point) => void);
+
     once(event: 'mouse-enter' | 'mouse-leave' | 'mouse-move' | 'right-click', listener: (event: Event,
-                                                        position: Point) => void);
+                                                                                         position: Point) => void);
+
     destroy(): void;
+
     // /**
     //  * Displays a tray balloon.
     //  */
@@ -56,23 +65,28 @@ export interface TrayProxy {
      * 'always' modes when the window visibility changes.
      */
     setHighlightMode(mode: 'selection' | 'always' | 'never'): void;
+
     /**
      * 图片可以来自于网络指定isWeb=true
      */
     setImage(imageUrl: string, isWeb?: boolean): void;
+
     /**
      * Sets the image associated with this tray icon when pressed on macOS.
      */
+
     // setPressedImage(image: NativeImage): void;
     /**
      * Sets the title displayed aside of the tray icon in the status bar (Support ANSI
      * colors).
      */
     setTitle(title: string): void;
+
     /**
      * Sets the hover text for this tray icon.
      */
     setToolTip(toolTip: string): void;
+
     setContextMenuTemplate(template: any[]): void;
 }
 
@@ -91,6 +105,7 @@ export interface Rectangle {
      */
     y: number;
 }
+
 export interface Point {
     // Docs: http://electron.atom.io/docs/api/structures/point
     x: number;

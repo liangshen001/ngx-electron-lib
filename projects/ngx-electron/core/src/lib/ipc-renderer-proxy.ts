@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import {IpcRenderer} from 'electron';
 import {NgZone} from '@angular/core';
 import {global} from '@angular/compiler/src/util';
@@ -19,10 +19,10 @@ export class IpcRendererProxy implements IpcRenderer {
     /**
      * 用于存放渲染进程中的回调 对应的 channel
      */
-    private callbackMap = new WeakMap<String, Function>();
-    private callbackMap2 = new WeakMap<Function, string>();
+    private callbackMap = new Map<String, Function>();
+    private callbackMap2 = new Map<Function, string>();
 
-    private mainCallbackMap = new WeakMap<String, Function>();
+    private mainCallbackMap = new Map<String, Function>();
 
     constructor(private ipcRenderer: IpcRenderer, private ngZone: NgZone) {
         this.on('ngx-electron-main-execute-callback', (event, callbackId, ...args) => {
@@ -124,12 +124,12 @@ export class IpcRendererProxy implements IpcRenderer {
 
     send(channel: string, ...args: any[]): void {
         args = this.registryCallback(args);
-        console.log(args);
         this.ipcRenderer.send(channel, ...args);
     }
 
     sendSync(channel: string, ...args: any[]): any {
         args = this.registryCallback(args);
+        console.log(args);
         this.ipcRenderer.sendSync(channel, ...args);
     }
 
@@ -148,34 +148,37 @@ export class IpcRendererProxy implements IpcRenderer {
         return this;
     }
 
-    private registryCallback(obj: any, objs = []): any {
-        if (proxy_set.has(obj) || objs.includes(obj)) {
-            return null;
-        }
-        objs.push(obj);
+    private registryCallback(obj: any, cache = []): any {
         if (obj instanceof Function) {
-            let callbackId = uuidv4();
-            if (this.callbackMap2.has(obj)) {
-                callbackId = this.callbackMap2.get(obj);
-            } else {
-                callbackId = uuidv4();
-                this.callbackMap2.set(obj, callbackId);
-                this.callbackMap.set(callbackId, (...args) => this.ngZone.run(() => setTimeout(() => obj(...args))));
-                this.send('ngx-electron-renderer-registry-callback', callbackId);
+            if (cache.includes(obj)) {
+                if (obj instanceof Function) {
+                    return {
+                        type: 'ngx-electron-callback',
+                        id: this.callbackMap2.get(obj)
+                    };
+                }
+                return null;
             }
+            cache.push(obj);
+            const callbackId = uuidv4();
+            this.callbackMap2.set(obj, callbackId);
+            this.callbackMap.set(callbackId, (...args) => this.ngZone.run(() => setTimeout(() => obj(...args))));
+            this.send('ngx-electron-renderer-registry-callback', callbackId);
             return {
                 type: 'ngx-electron-callback',
                 id: callbackId
             };
-        } else if (obj instanceof Array) {
-            return obj.map(o => this.registryCallback(o, objs));
+        }
+        if (cache.includes(obj) || proxy_set.has(obj)) {
+            return null;
+        }
+        cache.push(obj);
+        if (obj instanceof Array) {
+            return obj.map(o => this.registryCallback(o, cache));
         } else if (obj instanceof Object) {
+            const newObj = {};
             for (const key of Object.keys(obj)) {
-                if (obj[key] instanceof Function) {
-                    obj[key] = this.registryCallback(obj[key], objs);
-                } else {
-                    this.registryCallback(obj[key], objs);
-                }
+                newObj[key] = this.registryCallback(obj[key], cache);
             }
         }
         return obj;
