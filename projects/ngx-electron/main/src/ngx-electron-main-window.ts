@@ -4,7 +4,7 @@ import * as url from 'url';
 import * as electronReload from 'electron-reload';
 import {host, isServe, openDevTools, port} from './ngx-electron-main-args';
 
-const s = path.join(app.getAppPath(), 'dist', app.getName());
+const s = path.join(app.getAppPath(), 'dist', app.name);
 console.log(s);
 electronReload(s, {
 
@@ -24,7 +24,7 @@ function createWindow(options: BrowserWindowOptions): BrowserWindow {
         console.log(`创建窗口加载服务：${loadUrl}`);
         win.loadURL(loadUrl);
     } else {
-        const pathname = path.join(app.getAppPath(), `/dist/${app.getName()}/index.html`);
+        const pathname = path.join(app.getAppPath(), `/dist/${app.name}/index.html`);
         console.log(`创建本地文件窗口 pathname:${pathname}#${options.path}`);
         win.loadURL(url.format({
             pathname,

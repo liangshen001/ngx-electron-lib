@@ -36,7 +36,7 @@ function convertImgToNativeImage(imageUrl): Promise<NativeImage | string> {
             });
         } else {
             const image = nativeImage.createFromPath(
-                path.join(app.getAppPath(), 'dist', app.getName(), imageUrl));
+                path.join(app.getAppPath(), 'dist', app.name, imageUrl));
             resolve(image);
         }
     });

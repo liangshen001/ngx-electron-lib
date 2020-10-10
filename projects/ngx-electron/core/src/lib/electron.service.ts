@@ -2,6 +2,7 @@ import {Injectable, NgZone} from '@angular/core';
 import {Router} from '@angular/router';
 import {Observable} from 'rxjs';
 import {
+    app,
     BrowserWindow,
     BrowserWindowConstructorOptions,
     IpcMainEvent,
@@ -160,7 +161,7 @@ export class ElectronService {
                 const httpUrl = this.isServe ? `http://${location.hostname}:${location.port}/#${options.path}` :
                     `${url.format({
                         pathname: path.join(this.remote.app.getAppPath(),
-                            'dist', this.remote.app.getName(), 'index.html'),
+                            'dist', this.remote.app.name, 'index.html'),
                         protocol: 'file:',
                         slashes: true
                     })}#${options.path}`;
