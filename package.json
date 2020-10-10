@@ -61,7 +61,7 @@
   "devDependencies": {
     "@types/uuid": "~8.0.0",
     "cpy-cli": "~3.1.1",
-    "electron": "~7.1.7",
+    "electron": "~7.2.4",
     "@ngx-electron/builder": "file:./dist/ngx-electron/builder",
     "@ngx-electron/cli": "file:./dist/ngx-electron/cli",
     "@ngx-electron/schematics": "file:./dist/ngx-electron/schematics",
