@@ -73,16 +73,15 @@ export class Page1IndexComponent implements OnInit {
     createTray() {
         // this.electronService.tray.create('assets/favicon.ico');
         this.electronService.tray.create('assets/favicon.ico');
-        this.electronService.tray.setContextMenu(this.electronService.remote.Menu.buildFromTemplate([{
+        const menu = this.electronService.remote.Menu.buildFromTemplate([{
             label: 'test',
             click: () => {
                 alert(1111);
             }
         }, {
-            label: '兰兰'
-        }, {
-            label: '打开设置'
-        }]));
+            label: '2222'
+        }]);
+        this.electronService.tray.setContextMenu(menu);
 
         // this.electronService.ipcRenderer.sendSync('ngx-electron-renderer-set-tray-menu-items', [{
         //     label: 'test',

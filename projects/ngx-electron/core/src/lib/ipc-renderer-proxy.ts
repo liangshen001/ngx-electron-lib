@@ -31,10 +31,7 @@ export class IpcRendererProxy implements IpcRenderer {
 
         });
         this.on('ngx-electron-main-registry-callback', (event, callbackId) => {
-            this.mainCallbackMap.set(callbackId, () => {
-                console.log(222222);
-                event.sender.send('ngx-electron-renderer-execute-callback', callbackId);
-            });
+            this.mainCallbackMap.set(callbackId, () => event.sender.send('ngx-electron-renderer-execute-callback', callbackId));
             event.returnValue = null;
         });
     }
@@ -148,31 +145,41 @@ export class IpcRendererProxy implements IpcRenderer {
         return this;
     }
 
-    private registryCallback(obj: any, objs = []): any {
-        if (proxy_set.has(obj) || objs.includes(obj)) {
-            return null;
+    private registryCallback(obj: any, objs = new Map()): any {
+        let value = objs.get(obj);
+        if (proxy_set.has(obj) || value !== undefined) {
+            return value;
         }
-        objs.push(obj);
         if (obj instanceof Function) {
             const callbackId = uuidv4();
             this.callbackMap.set(callbackId, (...args) => this.ngZone.run(() => setTimeout(() => obj(...args))));
             this.send('ngx-electron-renderer-registry-callback', callbackId);
-            return {
+            value = {
                 type: 'ngx-electron-callback',
                 id: callbackId
             };
         } else if (obj instanceof Array) {
-            return obj.map(o => this.registryCallback(o, objs));
+            value = [];
+            objs.set(obj, value);
+            obj.forEach(o => value.push(this.registryCallback(o, objs)));
+            return value;
         } else if (obj instanceof Object) {
+            value = {};
+            objs.set(obj, value);
             for (const key of Object.keys(obj)) {
-                if (obj[key] instanceof Function) {
-                    obj[key] = this.registryCallback(obj[key], objs);
-                } else {
-                    this.registryCallback(obj[key], objs);
-                }
+                value[key] = this.registryCallback(obj[key], objs);
+                // if (obj[key] instanceof Function) {
+                //     obj[key] = this.registryCallback(obj[key], objs);
+                // } else {
+                //     this.registryCallback(obj[key], objs);
+                // }
             }
+            return value;
+        } else {
+            value = obj;
         }
-        return obj;
+        objs.set(obj, value);
+        return value;
     }
 
     private analysisCallback(obj, objs = []) {
