@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import {IpcRenderer} from 'electron';
 import {NgZone} from '@angular/core';
 import {global} from '@angular/compiler/src/util';
@@ -19,9 +19,10 @@ export class IpcRendererProxy implements IpcRenderer {
     /**
      * 用于存放渲染进程中的回调 对应的 channel
      */
-    private callbackMap = new Map<string, Function>();
+    private callbackMap = new Map<String, Function>();
+    private callbackMap2 = new Map<Function, string>();
 
-    private mainCallbackMap = new Map<string, Function>();
+    private mainCallbackMap = new Map<String, Function>();
 
     constructor(private ipcRenderer: IpcRenderer, private ngZone: NgZone) {
         this.on('ngx-electron-main-execute-callback', (event, callbackId, ...args) => {
@@ -31,7 +32,9 @@ export class IpcRendererProxy implements IpcRenderer {
 
         });
         this.on('ngx-electron-main-registry-callback', (event, callbackId) => {
-            this.mainCallbackMap.set(callbackId, () => event.sender.send('ngx-electron-renderer-execute-callback', callbackId));
+            this.mainCallbackMap.set(callbackId, () => {
+                event.sender.send('ngx-electron-renderer-execute-callback', callbackId);
+            });
             event.returnValue = null;
         });
     }
@@ -121,12 +124,12 @@ export class IpcRendererProxy implements IpcRenderer {
 
     send(channel: string, ...args: any[]): void {
         args = this.registryCallback(args);
-        console.log(args);
         this.ipcRenderer.send(channel, ...args);
     }
 
     sendSync(channel: string, ...args: any[]): any {
         args = this.registryCallback(args);
+        console.log(args);
         this.ipcRenderer.sendSync(channel, ...args);
     }
 
@@ -145,41 +148,40 @@ export class IpcRendererProxy implements IpcRenderer {
         return this;
     }
 
-    private registryCallback(obj: any, objs = new Map()): any {
-        let value = objs.get(obj);
-        if (proxy_set.has(obj) || value !== undefined) {
-            return value;
-        }
+    private registryCallback(obj: any, cache = []): any {
         if (obj instanceof Function) {
+            if (cache.includes(obj)) {
+                if (obj instanceof Function) {
+                    return {
+                        type: 'ngx-electron-callback',
+                        id: this.callbackMap2.get(obj)
+                    };
+                }
+                return null;
+            }
+            cache.push(obj);
             const callbackId = uuidv4();
+            this.callbackMap2.set(obj, callbackId);
             this.callbackMap.set(callbackId, (...args) => this.ngZone.run(() => setTimeout(() => obj(...args))));
             this.send('ngx-electron-renderer-registry-callback', callbackId);
-            value = {
+            return {
                 type: 'ngx-electron-callback',
                 id: callbackId
             };
-        } else if (obj instanceof Array) {
-            value = [];
-            objs.set(obj, value);
-            obj.forEach(o => value.push(this.registryCallback(o, objs)));
-            return value;
-        } else if (obj instanceof Object) {
-            value = {};
-            objs.set(obj, value);
-            for (const key of Object.keys(obj)) {
-                value[key] = this.registryCallback(obj[key], objs);
-                // if (obj[key] instanceof Function) {
-                //     obj[key] = this.registryCallback(obj[key], objs);
-                // } else {
-                //     this.registryCallback(obj[key], objs);
-                // }
-            }
-            return value;
-        } else {
-            value = obj;
         }
-        objs.set(obj, value);
-        return value;
+        if (cache.includes(obj) || proxy_set.has(obj)) {
+            return null;
+        }
+        cache.push(obj);
+        if (obj instanceof Array) {
+            return obj.map(o => this.registryCallback(o, cache));
+        } else if (obj instanceof Object) {
+            const newObj = {};
+            for (const key of Object.keys(obj)) {
+                newObj[key] = this.registryCallback(obj[key], cache);
+            }
+        }
+        return obj;
     }
 
     private analysisCallback(obj, objs = []) {

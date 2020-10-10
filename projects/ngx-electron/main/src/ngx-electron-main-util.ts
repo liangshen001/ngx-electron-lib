@@ -141,14 +141,20 @@ function analysisCallback(obj, cache = []) {
         return obj.map(o => analysisCallback(o));
     } else if (obj instanceof Object) {
         if (obj.type === 'ngx-electron-callback') {
-            return rendererCallbackMap.get(obj.id);
-        }
-        for (const key of Object.keys(obj)) {
-            if (obj[key] instanceof Object && obj[key].type === 'ngx-electron-callback') {
-                obj[key] = analysisCallback(obj[key], cache);
-            } else {
-                analysisCallback(obj[key], cache);
+            return (...args) => {
+                console.log(1111111111);
+                rendererCallbackMap.get(obj.id)(...args);
+            };
+        } else {
+            const newObj: any = {};
+            for (const key of Object.keys(obj)) {
+                // if (obj[key] instanceof Object && obj[key].type === 'ngx-electron-callback') {
+                newObj[key] = analysisCallback(obj[key], cache);
+                // } else {
+                //     analysisCallback(obj[key], cache);
+                // }
             }
+            return newObj;
         }
     }
     return obj;

@@ -242,10 +242,9 @@ export class TrayProxy implements Tray {
     on(event: any, listener: any): this {
         if (this.isDestroyed()) {
             console.warn('Tray has been destroyed');
+        } else {
+            this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'on', event, listener);
         }
-        const timestamp = new Date().getTime();
-        this.ipcRenderer.on(`ngx-electron-tray-on-${event}-${timestamp}`, listener);
-        this.ipcRenderer.sendSync(`ngx-electron-tray-on-event`, event, timestamp);
         return this;
     }
 
@@ -253,9 +252,7 @@ export class TrayProxy implements Tray {
         if (this.isDestroyed()) {
             console.warn('Tray has been destroyed');
         } else {
-            const timestamp = new Date().getTime();
-            this.ipcRenderer.on(`ngx-electron-tray-once-${event}-${timestamp}`, listener);
-            this.ipcRenderer.sendSync(`ngx-electron-tray-once-event`, event, timestamp);
+            this.ipcRenderer.sendSync('ngx-electron-tray-apply-method', 'once', event, listener);
         }
         return this;
     }

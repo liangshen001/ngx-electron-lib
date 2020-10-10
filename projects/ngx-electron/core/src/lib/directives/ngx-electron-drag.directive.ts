@@ -1,4 +1,4 @@
-import {Directive, ElementRef, Input, OnInit, Renderer2} from '@angular/core';
+import {AfterContentChecked, ContentChild, ContentChildren, Directive, ElementRef, Input, OnInit, Renderer2} from '@angular/core';
 
 /**
  * 无素可否tuo动应用
@@ -7,7 +7,6 @@ import {Directive, ElementRef, Input, OnInit, Renderer2} from '@angular/core';
   selector: '[ngxElectronDrag]'
 })
 export class NgxElectronDragDirective implements OnInit {
-
   @Input()
   set ngxElectronDrag(ngxElectronDrag: boolean) {
     if (ngxElectronDrag === false) {
