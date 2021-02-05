@@ -1,4 +1,3 @@
-import {v4 as uuidv4} from 'uuid';
 import {IpcRenderer} from 'electron';
 import {NgZone} from '@angular/core';
 import {global} from '@angular/compiler/src/util';
@@ -19,8 +18,8 @@ export class IpcRendererProxy implements IpcRenderer {
     /**
      * 用于存放渲染进程中的回调 对应的 channel
      */
-    private callbackMap = new Map<String, Function>();
-    private callbackMap2 = new Map<Function, string>();
+    private callbackMap = new Map<number, Function>();
+    private callbackMap2 = new Map<Function, number>();
 
     private mainCallbackMap = new Map<String, Function>();
 
@@ -160,7 +159,7 @@ export class IpcRendererProxy implements IpcRenderer {
                 return null;
             }
             cache.push(obj);
-            const callbackId = uuidv4();
+            const callbackId = Math.random();
             this.callbackMap2.set(obj, callbackId);
             this.callbackMap.set(callbackId, (...args) => this.ngZone.run(() => setTimeout(() => obj(...args))));
             this.send('ngx-electron-renderer-registry-callback', callbackId);
@@ -206,5 +205,12 @@ export class IpcRendererProxy implements IpcRenderer {
         return obj;
     }
 
+    /* node12 */
+    rawListeners(event: string | symbol): Function[] {
+        return [];
+    }
+    off(event: string | symbol, listener: (...args: any[]) => void): this {
+        return this;
+    }
 
 }

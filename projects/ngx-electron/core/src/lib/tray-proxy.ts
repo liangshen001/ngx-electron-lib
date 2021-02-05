@@ -257,4 +257,12 @@ export class TrayProxy implements Tray {
         return this;
     }
 
+    /* node12 */
+    rawListeners(event: string | symbol): Function[] {
+        return [];
+    }
+    off(event: string | symbol, listener: (...args: any[]) => void): this {
+        return this;
+    }
+
 }

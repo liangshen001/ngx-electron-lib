@@ -9,7 +9,7 @@ import {createTray, createWindow, initElectronMainIpcListener, isMac} from '@ngx
 let win: BrowserWindow;
 initElectronMainIpcListener();
 
-function init() {
+function init(): void {
     // createTray('icon/logo.png');
     win = createWindow({
         path: '',
@@ -44,7 +44,8 @@ app.on('activate', () => {
     if (win === null) {
         // loginWin = createLoginWindow(appTray);
     }
-});`;
+});
+`;
 
 interface NgAddOptions {
     redux: boolean;
@@ -55,6 +56,7 @@ interface NgAddOptions {
 // Just return the tree
 export function ngAdd(options: NgAddOptions): Rule {
     return (tree: Tree, context: SchematicContext) => {
+        context.logger.info('start schematic');
         if (!tree.exists('angular.json') || !tree.exists('package.json') || !tree.exists('tsconfig.json')) {
             context.logger.error('This is not an angular cli application');
             return;
@@ -68,8 +70,10 @@ export function ngAdd(options: NgAddOptions): Rule {
 
         createELectronELectronBuilderJson(tree);
 
+        context.logger.info('4');
         createELectronTsconfigJson(tree);
 
+        context.logger.info('5');
 
         addToPackageJson(tree, 'electron-serve-start',
             'ng run ' + angularJson.defaultProject + ':electron-serve-start', 'scripts');
@@ -93,6 +97,7 @@ export function ngAdd(options: NgAddOptions): Rule {
             addToPackageJson(tree, 'electron-build:linux:' + key,
                 'ng run ' + angularJson.defaultProject + ':electron-build:' + key + ' --linux=true', 'scripts');
         });
+        context.logger.info('6');
 
 
         addToPackageJson(tree, '@ngx-electron/main', packageJson.version, 'dependencies');
@@ -280,7 +285,7 @@ export function addToPackageJson(
 ): Tree {
 
     const tsconfigText = host.read('tsconfig.json')!.toString('utf-8');
-    const tsconfigJson = JSON.parse(tsconfigText);
+    const tsconfigJson = JSON.parse(tsconfigText.replace(/(?:^|\n|\r)\s*\/\*[\s\S]*?\*\/\s*(?:\r|\n|$)/g, ''));
 
     if (tsconfigJson.compilerOptions && tsconfigJson.compilerOptions.paths && tsconfigJson.compilerOptions.paths[key]) {
         return host;

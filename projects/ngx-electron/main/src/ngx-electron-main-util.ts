@@ -1,5 +1,4 @@
 import {ipcMain, IpcMain, WebContents, MenuItem} from 'electron';
-import { v4 as uuidv4 } from 'uuid';
 import {global} from '@angular/compiler/src/util';
 
 const proxy_set = new WeakSet();
@@ -25,7 +24,7 @@ function isLinux() {
 }
 
 const rendererCallbackMap = new Map<string, Function>();
-const mainCallbackMap = new Map<string, Function>();
+const mainCallbackMap = new Map<number, Function>();
 
 
 const ipcMainProxy: IpcMain = {
@@ -106,7 +105,7 @@ function registryCallback(sender: WebContents, obj, cache = []) {
     }
     cache.push(obj);
     if (obj instanceof Function) {
-        const callbackId = uuidv4();
+        const callbackId = Math.random();
         mainCallbackMap.set(callbackId, obj);
         sender.send('ngx-electron-main-registry-callback', callbackId);
         return {
