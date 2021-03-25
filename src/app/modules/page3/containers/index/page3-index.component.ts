@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {map} from 'rxjs/operators';
 import {Observable} from 'rxjs';
-import {ElectronService} from '@ngx-electron/core';
+import {NgxElectronService} from '@ngx-electron/renderer';
 
 @Component({
     selector: 'app-page3',
@@ -13,7 +13,7 @@ export class Page3IndexComponent implements OnInit {
 
     data$: Observable<string>;
 
-    constructor(private electronService: ElectronService) {}
+    constructor(private electronService: NgxElectronService) {}
 
     ngOnInit(): void {
         this.data$ = this.electronService.data<string>().pipe(

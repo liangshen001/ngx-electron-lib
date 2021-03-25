@@ -1,29 +1,20 @@
 {
-  "name": "@ngx-electron/cli",
+  "name": "@ngx-electron/renderer",
   "version": "11.8.5",
-  "main": "index.js",
-  "dependencies": {
-    "commander": "~4.0.1",
-    "fs-extra": "~8.1.0",
-    "tslib": "~1.10.0"
-  },
   "peerDependencies": {
+    "@angular/common": "~11.1.2",
     "electron": "^7.3.3",
     "@angular/cli": "~11.1.4",
     "electron-builder": "22.4.0",
     "electron-updater": "~4.3.5",
     "electron-reload": "~1.5.0",
-    "@angular/core": "~11.1.2",
-    "@angular/common": "~11.1.2"
-  },
-  "bin": {
-    "ngx-electron": "./bin/ngx-electron.js"
+    "@angular/core": "~11.1.2"
   },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/liangshen001/ngx-electron-lib/issues"
   },
-  "homepage": "https://github.com/liangshen001/ngx-electron-lib/blob/master/projects/ngx-electron/cli/README.md",
+  "homepage": "https://github.com/liangshen001/ngx-electron-lib/blob/master/projects/ngx-electron/renderer/README.md",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/liangshen001/ngx-electron-lib.git"

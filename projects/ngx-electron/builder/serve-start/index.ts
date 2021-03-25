@@ -1,7 +1,7 @@
 import {DevServerBuilderOptions, DevServerBuilderOutput, executeDevServerBuilder} from '@angular-devkit/build-angular';
 import {Observable, of} from 'rxjs';
 import {BuilderContext, createBuilder, targetFromTargetString} from '@angular-devkit/architect';
-import {flatMap, map} from 'rxjs/operators';
+import {flatMap, map, mergeMap} from 'rxjs/operators';
 import {getOptions, spawn} from '../utils';
 import {JsonObject} from '@angular-devkit/core';
 import {fromPromise} from 'rxjs/internal-compatibility';
@@ -22,8 +22,8 @@ function commandBuilder(
     let started = false;
 
     return spawn(context, 'tsc', ['-p', path.join(process.cwd(), options.electronRoot)]).pipe(
-        flatMap(() => fromPromise(context.getTargetOptions(devServerTarget))),
-        flatMap((rawBrowserOptions: DevServerBuilderOptions) => {
+        mergeMap(() => fromPromise(context.getTargetOptions(devServerTarget))),
+        mergeMap((rawBrowserOptions: DevServerBuilderOptions) => {
             rawBrowserOptions.host = rawBrowserOptions.host || 'localhost';
             rawBrowserOptions.port = rawBrowserOptions.port || 4200;
             rawBrowserOptions.watch = true;
@@ -34,7 +34,7 @@ function commandBuilder(
                     target: 'electron-renderer'
                 })
             }).pipe(
-                flatMap(data => {
+                mergeMap(data => {
                     if (started) {
                         return of(data);
                     }
@@ -46,8 +46,8 @@ function commandBuilder(
                     }, true)]).pipe(
                         map(() => data)
                     );
-                })
+                }) as any
             );
         }),
-    );
+    ) as any;
 }

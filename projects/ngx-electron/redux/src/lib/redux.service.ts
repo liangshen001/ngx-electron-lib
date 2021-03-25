@@ -1,7 +1,7 @@
 import {Injectable, NgZone} from '@angular/core';
 import {Action, Store} from '@ngrx/store';
 import {concat} from 'rxjs';
-import {ElectronService} from '@ngx-electron/core';
+import {NgxElectronService} from '@ngx-electron/renderer';
 import {BrowserWindowConstructorOptions, IpcMainEvent} from 'electron';
 
 export type BrowserWindowOptions = BrowserWindowConstructorOptions
@@ -13,7 +13,7 @@ export type BrowserWindowOptions = BrowserWindowConstructorOptions
 export class ReduxService {
 
   constructor(private store$: Store<any>,
-              private electronService: ElectronService,
+              private electronService: NgxElectronService,
               private ngZone: NgZone) {
   }
 }

@@ -1,13 +1,23 @@
-import {app, BrowserWindow, ipcMain, Tray} from 'electron';
-import {createTray, createWindow, initElectronMainIpcListener, isMac, ipcMainProxy} from '@ngx-electron/main';
+import {app, BrowserWindow, ipcMain, remote, Tray} from 'electron';
+import { autoUpdater } from 'electron-updater';
+import {createTray, initElectronMainIpcListener, isMac} from '@ngx-electron/main';
+import * as core from '@ngx-electron/core';
+import {NgxElectronBrowserWindowProxy} from '@ngx-electron/core';
+// export class BrowserWindowProxy extends BrowserWindow {
+// }
 
-let win: BrowserWindow;
-initElectronMainIpcListener('http://127.0.0.1:8889/');
+let win: NgxElectronBrowserWindowProxy;
+initElectronMainIpcListener();
+
+ipcMain.on('sendFunctionToMain', (event, callback) => {
+    callback(() => {
+        console.log(1111111);
+    });
+})
+
 
 function init() {
-    // createTray('assets/favicon.ico');
-    win = createWindow({
-        path: '',
+    win = new NgxElectronBrowserWindowProxy({
         width: 1024,
         height: 768,
         show: true,
@@ -18,17 +28,29 @@ function init() {
             webSecurity: false
         }
     });
-    win.on('close', () => app.quit());
+    win.webContents.openDevTools();
+    win.onClose.subscribe(() => app.quit());
+    // createTray('assets/favicon.ico');
+    // win = createWindow({
+    //     path: '',
+    //     width: 1024,
+    //     height: 768,
+    //     show: true,
+    //     autoHideMenuBar: true,
+    //     title: 'ngx-electron-lib',
+    //     webPreferences: {
+    //         nodeIntegration: true,
+    //         webSecurity: false
+    //     }
+    // });
+    // win.webContents.openDevTools();
+    // win.on('close', () => app.quit());
 }
 
-ipcMainProxy.on('ngx-electron-renderer-set-tray-menu2', (e, a) => {
+ipcMain.on('ngx-electron-renderer-set-tray-menu2', (e, a) => {
     const tray = new Tray('F:/WebStorm/workspace/ngx-electron-lib/src/assets/favicon.ico');
     tray.setContextMenu(a);
     // tray.setContextMenu(a);
-});
-
-ipcMainProxy.on('test-test', (e, a) => {
-    a.test();
 });
 
 

@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {ActionsSubject, ReducerManager, StateObservable} from '@ngrx/store';
-import {ElectronService} from '@ngx-electron/core';
+import {NgxElectronService} from '@ngx-electron/renderer';
 import {Router} from '@angular/router';
 import {loadUserList} from '../../../../actions/user.action';
-import {ElectronStore} from '@ngx-electron/redux';
+import {NgxElectronStore} from '@ngx-electron/redux';
 import {AppState} from '../../../../reducers';
 import {BrowserWindow} from 'electron';
 import {take} from 'rxjs/operators';
+import {NgxElectronBrowserWindowProxy} from '@ngx-electron/core';
 
 @Component({
     selector: 'app-page1',
@@ -18,17 +19,19 @@ export class Page1IndexComponent implements OnInit {
     page2Win: BrowserWindow;
     page3Win: BrowserWindow;
 
+    message: string;
+
 
     ngOnInit(): void {
         this.store$.dispatch(loadUserList());
     }
 
-    constructor(private electronService: ElectronService,
+    constructor(private electronService: NgxElectronService,
                 private state$: StateObservable,
                 private actionsObserver: ActionsSubject,
                 private reducerManager: ReducerManager,
                 private router: Router,
-                private store$: ElectronStore<AppState>) {
+                private store$: NgxElectronStore<AppState>) {
         // const a = new this.electronService.electron.remote.Tray('');
         // console.log(a);
         this.state$.pipe(
@@ -38,11 +41,10 @@ export class Page1IndexComponent implements OnInit {
 
         // this.electronService.remote.getCurrentWindow().webContents.openDevTools();
         this.electronService.autoUpdater.checkingForUpdate.subscribe((a) => {
-            console.log('checkingForUpdate');
+            console.log('checkingForUpdate' + JSON.stringify(a));
         });
         this.electronService.autoUpdater.updateAvailable.subscribe((a) => {
             console.log('updateAvailable' + JSON.stringify(a));
-            this.electronService.autoUpdater.downloadUpdate();
         });
         this.electronService.autoUpdater.updateNotAvailable.subscribe((a) => {
             console.log('updateNotAvailable' + JSON.stringify(a));
@@ -50,11 +52,21 @@ export class Page1IndexComponent implements OnInit {
         this.electronService.autoUpdater.error.subscribe((e) => {
             console.log('error' + JSON.stringify(e));
         });
-        this.electronService.autoUpdater.downloadProgress.subscribe((a) => {
-            alert(a);
+        this.electronService.autoUpdater.downloadProgress.subscribe((e) => {
+            console.log('downloadProgress' + JSON.stringify(e));
         });
-        this.electronService.autoUpdater.updateDownloateDownloaded.subscribe((a) => {
-            alert(a);
+        this.electronService.autoUpdater.updateDownloaded.subscribe((e) => {
+            console.log('updateDownloateDownloaded' + JSON.stringify(e));
+        });
+        this.electronService.ipcRenderer.on('message', (event, text) => {
+            console.log(text);
+        });
+        // 注意：“downloadProgress”事件可能存在无法触发的问题，只需要限制一下下载网速就好了
+        this.electronService.ipcRenderer.on('downloadProgress', (event, progressObj)=> {
+            console.log(progressObj);
+        });
+        this.electronService.ipcRenderer.on('isUpdateNow', () => {
+            this.electronService.ipcRenderer.send('isUpdateNow');
         });
 
         // this.electronService.tray.on('double-click', () => this.electronService.remote.getCurrentWindow().focus());
@@ -117,6 +129,14 @@ export class Page1IndexComponent implements OnInit {
         this.electronService.sendDataToWindows('page2 data', this.page3Win);
     }
 
+    downloadUpdate(): void {
+        this.electronService.autoUpdater.downloadUpdate();
+    }
+
+    checkForUpdates(): void {
+        this.electronService.autoUpdater.checkForUpdates();
+    }
+
     openPage3() {
         if (this.electronService.isElectron) {
             this.page3Win = this.electronService.createWindow({
@@ -149,5 +169,25 @@ export class Page1IndexComponent implements OnInit {
         //         )
         //     ]
         // });
+    }
+
+    sendFunctionToMain() {
+        // this.electronService.electron.ipcRenderer.send('sendFunctionToMain', (a) => {a((b) => {console.log(b)}, (c) => {console.log(c)})})
+        // this.electronService.electron.ipcRenderer.send('sendFunctionToMain', (a) => {a()})
+        const win = new NgxElectronBrowserWindowProxy({
+            width: 1024,
+            height: 768,
+            show: true,
+            autoHideMenuBar: true,
+            title: 'ngx-electron-lib',
+            webPreferences: {
+                nodeIntegration: true,
+                webSecurity: false
+            }
+        });
+        win.webContents.openDevTools();
+        win.onClose.subscribe(a => {
+            alert(1);
+        })
     }
 }

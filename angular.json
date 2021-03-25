@@ -165,33 +165,38 @@
         }
       }
     },
-    "@ngx-electron/core": {
+    "@ngx-electron/renderer": {
       "projectType": "library",
-      "root": "projects/ngx-electron/core",
-      "sourceRoot": "projects/ngx-electron/core/src",
+      "root": "projects/ngx-electron/renderer",
+      "sourceRoot": "projects/ngx-electron/renderer/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "projects/ngx-electron/core/tsconfig.lib.json",
-            "project": "projects/ngx-electron/core/ng-package.json"
-          }
+            "tsConfig": "projects/ngx-electron/renderer/tsconfig.lib.json",
+            "project": "projects/ngx-electron/renderer/ng-package.json"
+          },
+            "configurations": {
+              "production": {
+                "tsConfig": "projects/ngx-electron/renderer/tsconfig.lib.prod.json"
+              }
+            }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/ngx-electron/core/src/test.ts",
-            "tsConfig": "projects/ngx-electron/core/tsconfig.spec.json",
-            "karmaConfig": "projects/ngx-electron/core/karma.conf.js"
+            "main": "projects/ngx-electron/renderer/src/test.ts",
+            "tsConfig": "projects/ngx-electron/renderer/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-electron/renderer/karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/ngx-electron/core/tsconfig.lib.json",
-              "projects/ngx-electron/core/tsconfig.spec.json"
+              "projects/ngx-electron/renderer/tsconfig.lib.json",
+              "projects/ngx-electron/renderer/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
@@ -211,7 +216,12 @@
                   "options": {
                       "tsConfig": "projects/ngx-electron/redux/tsconfig.lib.json",
                       "project": "projects/ngx-electron/redux/ng-package.json"
-                  }
+                  },
+            "configurations": {
+              "production": {
+                "tsConfig": "projects/ngx-electron/redux/tsconfig.lib.prod.json"
+              }
+            }
               },
               "test": {
                   "builder": "@angular-devkit/build-angular:karma",
@@ -227,6 +237,46 @@
                       "tsConfig": [
                           "projects/ngx-electron/redux/tsconfig.lib.json",
                           "projects/ngx-electron/redux/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "@ngx-electron/core": {
+      "projectType": "library",
+      "root": "projects/ngx-electron/core",
+      "sourceRoot": "projects/ngx-electron/core/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/ngx-electron/core/tsconfig.lib.json",
+            "project": "projects/ngx-electron/core/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-electron/core/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-electron/core/src/test.ts",
+            "tsConfig": "projects/ngx-electron/core/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-electron/core/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-electron/core/tsconfig.lib.json",
+              "projects/ngx-electron/core/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"

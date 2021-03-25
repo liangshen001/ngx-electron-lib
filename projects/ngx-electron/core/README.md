@@ -1,35 +1,24 @@
-# @ngx-electron/core
+# @ngx-electron/main
 
-angular 8.x
-electron 7.x
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.14.
 
+## Code scaffolding
 
-main.ts
-```
-import {ipcMainProxy} from '@ngx-electron/main';
+Run `ng generate component component-name --project cli` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project cli`.
+> Note: Don't forget to add `--project cli` or else it will be added to the default project in your `angular.json` file. 
 
-ipcMainProxy.on('test', (event, a) => {
-    a((args) => {
-        console.log(args);
-    });
-});
-```
+## Build
 
+Run `ng build cli` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-angular
-```
+## Publishing
 
-constructor(private electronService: ElectronService) {}
+After building your library with `ng build cli`, go to the dist folder `cd dist/cli` and run `npm publish`.
 
-test() {
-    this.electronService.ipcRenderer.send('test', (callback: (args) => void) => {
-        // ...
-        callback('俩层回调函数');
-        // ...
-    });
-}
-```
+## Running unit tests
 
+Run `ng test cli` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
+## Further help
 
-
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).

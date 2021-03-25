@@ -1,34 +1,34 @@
 import {Injectable, NgZone} from '@angular/core';
 import {Router} from '@angular/router';
 import {Observable} from 'rxjs';
-import {
-    app,
-    BrowserWindow,
-    BrowserWindowConstructorOptions,
-    IpcMainEvent,
-    IpcRenderer,
-    IpcRendererEvent,
-    Remote,
-    RendererInterface
-} from 'electron';
-import * as childProcess from 'child_process';
+import {BrowserWindow, BrowserWindowConstructorOptions, IpcMainEvent, IpcRendererEvent, Remote, RendererInterface, IpcRenderer} from 'electron';
+import * as electron from 'electron';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as path from 'path';
 import {TrayProxy} from './tray-proxy';
 import {AutoUpdaterProxy} from './auto-updater-proxy';
 import {IpcRendererProxy} from './ipc-renderer-proxy';
+import * as childProcess from 'child_process';
+import {fromPromise} from 'rxjs/internal-compatibility';
+import {map} from 'rxjs/operators';
+import {HttpClient} from '@angular/common/http';
+import {ElectronProxy} from '@ngx-electron/core';
 
-export type BrowserWindowOptions =
-    BrowserWindowConstructorOptions
-    & { path: string, key?: string, parentKey?: string, parentId?: number, callback?: (event: IpcMainEvent) => void };
-
+export type BrowserWindowOptions = BrowserWindowConstructorOptions &
+    {
+        path: string;
+        key?: string;
+        parentKey?: string;
+        parentId?: number;
+        callback?: (event: IpcMainEvent) => void;
+    };
 
 
 @Injectable({
     providedIn: 'root'
 })
-export class ElectronService {
+export class NgxElectronService {
 
     openerBrowserWindow?: BrowserWindow;
 
@@ -36,7 +36,7 @@ export class ElectronService {
 
     remote?: Remote;
 
-    ipcRenderer?: IpcRendererProxy;
+    ipcRenderer?: IpcRenderer;
 
     childProcess?: typeof childProcess;
     fs?: typeof fs;
@@ -82,27 +82,50 @@ export class ElectronService {
     }
 
     constructor(private router: Router,
+                private httpClient: HttpClient,
                 private ngZone: NgZone) {
         if (!this.isElectron) {
             return;
         }
-        this.electron = (window as any).require('electron');
+        this.childProcess = childProcess;
+        this.fs = fs;
+        this.electron = electron;
+        ElectronProxy.proxy(this.electron, this.ngZone);
         this.remote = this.electron.remote;
-        this.ipcRenderer = new IpcRendererProxy(this.electron.ipcRenderer, this.ngZone);
+        this.ipcRenderer = this.electron.ipcRenderer;
         this.tray = new TrayProxy(this.electron, this.ipcRenderer, this.remote, this.ngZone);
 
-        if (!this.remote.ipcMain.listenerCount('ngx-electron-load-electron-main')) {
-            throw new Error('@ngx-electron/main is not imported in electron main');
-        }
         this.autoUpdater = new AutoUpdaterProxy(this.ipcRenderer, this.remote);
-        this.childProcess = (window as any).require('child_process');
-        this.fs = (window as any).require('fs');
 
         const winId = this.remote.getCurrentWindow().id;
         if (this.remote.ipcMain.listenerCount(`ngx-electron-renderer-win-initialized-${winId}`)) {
-            const openerWindowId = +this.ipcRenderer.sendSync(`ngx-electron-renderer-win-initialized-${winId}`);
-            this.openerBrowserWindow = this.remote.BrowserWindow.fromId(openerWindowId);
+            const openerWindowId = this.ipcRenderer.sendSync(`ngx-electron-renderer-win-initialized-${winId}`);
+            debugger;
+            this.openerBrowserWindow = this.remote.BrowserWindow.fromId(+openerWindowId);
         }
+
+        // this.childProcess = (window as any).require('child_process');
+        // import('fs').then(fs$ => this.fs = fs$);
+        // this.fs = (window as any).require('fs');
+        // import('electron').then(electron => {
+        //     this.electron = electron;
+        //     this.remote = this.electron.remote;
+        //     IpcRendererProxy.proxy(this.electron, this.ngZone);
+        //     this.ipcRenderer = this.electron.ipcRenderer;
+        //     this.tray = new TrayProxy(this.electron, this.ipcRenderer, this.remote, this.ngZone);
+        //     if (!this.remote.ipcMain.listenerCount('ngx-electron-load-electron-main')) {
+        //         throw new Error('@ngx-electron/main is not imported in electron main');
+        //     }
+        //     this.autoUpdater = new AutoUpdaterProxy(this.ipcRenderer, this.remote);
+        //
+        //     const winId = this.remote.getCurrentWindow().id;
+        //     if (this.remote.ipcMain.listenerCount(`ngx-electron-renderer-win-initialized-${winId}`)) {
+        //         const openerWindowId = +this.ipcRenderer.sendSync(`ngx-electron-renderer-win-initialized-${winId}`);
+        //         this.openerBrowserWindow = this.remote.BrowserWindow.fromId(openerWindowId);
+        //     }
+        // });
+        // this.electron = (window as any).require('electron');
+
     }
 
     sendDataToWindowsByKeys<T>(data: T, ...keys: string[]) {
@@ -215,6 +238,33 @@ export class ElectronService {
      */
     getWinIdByKey(key: string): number {
         return this.isElectron && this.ipcRenderer.sendSync('ngx-electron-renderer-get-win-id-by-key', key);
+    }
+
+    /**
+     * 加载json数组从assets中加载
+     * @param assetsPath json文件路径
+     */
+    loadJsonArrayFromAssets<T>(assetsPath: string): Observable<T[]> {
+        if (this.isServe || !this.isElectron) {
+            return this.httpClient.get<T[]>(assetsPath);
+        } else {
+            // 使用import得到的json数组类型为 {[a in number]: T} 需要进行处理
+            return fromPromise<{[a in number]: T}>(import((`src/${assetsPath}`))).pipe(
+                map<{[a in number]: T}, T[]>(data => Object.keys(data).map(k => data[k]))
+            );
+        }
+    }
+
+    /**
+     * 加载json文件从assets中加载
+     * @param assetsPath json文件路径
+     */
+    loadJsonObjectFromAssets<T>(assetsPath: string): Observable<T> {
+        if (this.isServe || !this.isElectron) {
+            return this.httpClient.get<T>(assetsPath);
+        } else {
+            return fromPromise<T>(import((`src/${assetsPath}`)));
+        }
     }
 
 }

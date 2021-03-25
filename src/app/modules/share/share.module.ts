@@ -2,14 +2,14 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {components} from './components';
-import {NgxElectronCoreModule} from '@ngx-electron/core';
+import {NgxElectronRendererModule} from '@ngx-electron/renderer';
 import {NgxElectronReduxModule} from '@ngx-electron/redux';
 import {StoreModule} from '@ngrx/store';
 
 @NgModule({
     imports: [
         CommonModule,
-        NgxElectronCoreModule,
+        NgxElectronRendererModule,
         NgxElectronReduxModule,
         FormsModule,
     ],
@@ -19,7 +19,7 @@ import {StoreModule} from '@ngrx/store';
     providers: [],
     exports: [
         CommonModule,
-        NgxElectronCoreModule,
+        NgxElectronRendererModule,
         NgxElectronReduxModule,
         FormsModule,
         ...components

@@ -57,13 +57,13 @@ options选项
  --store 来指定是否使用ngrx （使用ngrx可以很好的做到多个窗口间的数据同步）
  --skip-install 路过依赖包的下载
 
-#### 创建一个简单的项目 基于@ngx-electron/core
+#### 创建一个简单的项目 基于@ngx-electron/renderer
 
 ```
 ngx-electron new test
 ```
 
-#### 创建一个ngrx的项目 基于@ngx-electron/core和@ngx-electron/store 可以通过ngrx实现实时的数据同步
+#### 创建一个ngrx的项目 基于@ngx-electron/renderer和@ngx-electron/store 可以通过ngrx实现实时的数据同步
 
 ```
 ngx-electron new test --store

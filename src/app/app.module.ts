@@ -5,7 +5,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {StoreModule} from '@ngrx/store';
 import {metaReducers, reducers} from './reducers';
-import {NgxElectronCoreModule} from '@ngx-electron/core';
+import {NgxElectronRendererModule} from '@ngx-electron/renderer';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgxElectronReduxModule} from '@ngx-electron/redux';
 import {HttpClientModule} from '@angular/common/http';
@@ -26,7 +26,7 @@ import {effects} from './effects';
                 strictActionImmutability: true
             }
         }),
-        NgxElectronCoreModule,
+        NgxElectronRendererModule,
         NgxElectronReduxModule,
         HttpClientModule,
         BrowserAnimationsModule,

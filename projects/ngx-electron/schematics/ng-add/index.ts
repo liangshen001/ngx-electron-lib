@@ -56,7 +56,6 @@ interface NgAddOptions {
 // Just return the tree
 export function ngAdd(options: NgAddOptions): Rule {
     return (tree: Tree, context: SchematicContext) => {
-        context.logger.info('start schematic');
         if (!tree.exists('angular.json') || !tree.exists('package.json') || !tree.exists('tsconfig.json')) {
             context.logger.error('This is not an angular cli application');
             return;
@@ -70,10 +69,7 @@ export function ngAdd(options: NgAddOptions): Rule {
 
         createELectronELectronBuilderJson(tree);
 
-        context.logger.info('4');
         createELectronTsconfigJson(tree);
-
-        context.logger.info('5');
 
         addToPackageJson(tree, 'electron-serve-start',
             'ng run ' + angularJson.defaultProject + ':electron-serve-start', 'scripts');
@@ -97,11 +93,10 @@ export function ngAdd(options: NgAddOptions): Rule {
             addToPackageJson(tree, 'electron-build:linux:' + key,
                 'ng run ' + angularJson.defaultProject + ':electron-build:' + key + ' --linux=true', 'scripts');
         });
-        context.logger.info('6');
-
 
         addToPackageJson(tree, '@ngx-electron/main', packageJson.version, 'dependencies');
         addToPackageJson(tree, '@ngx-electron/builder', packageJson.version, 'devDependencies');
+        addToPackageJson(tree, '@ngx-electron/renderer', packageJson.version, 'dependencies');
         addToPackageJson(tree, '@ngx-electron/core', packageJson.version, 'dependencies');
         addToPackageJson(tree, 'electron-updater', packageJson.peerDependencies['electron-updater'], 'dependencies');
         addToPackageJson(tree, 'electron-builder', packageJson.peerDependencies['electron-builder'], 'devDependencies');

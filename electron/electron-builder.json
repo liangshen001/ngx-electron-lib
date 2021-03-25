@@ -30,17 +30,18 @@
                 "path": "/Applications"
             }
         ],
-        "title": "TiEthWallet ${version}"
+        "title": "${productName} ${version}"
     },
     "win": {
         "target": [
-            "nsis"
+            "nsis", "zip"
         ]
     },
     "mac": {
+        "electronUpdaterCompatibility": ">=2.15",
         "category": "public.app-category.utilities",
         "target": [
-            "dmg"
+            "dmg", "zip"
         ]
     },
     "linux": {

@@ -1,13 +1,13 @@
 import {BuilderContext, createBuilder} from '@angular-devkit/architect';
-import {JsonObject} from '@angular-devkit/core';
 import {BrowserBuilderOutput, executeBrowserBuilder} from '@angular-devkit/build-angular';
+import { getSystemPath, json, normalize, resolve, tags } from '@angular-devkit/core';
 import {Observable} from 'rxjs';
-import {Schema} from './schema';
+import {Schema as BrowserBuilderSchema} from './schema';
 
-export default createBuilder<Schema & JsonObject>(commandBuilder);
+export default createBuilder<json.JsonObject & BrowserBuilderSchema>(commandBuilder);
 
 function commandBuilder(
-    options: Schema,
+    options: BrowserBuilderSchema,
     context: BuilderContext,
 ): Observable<BrowserBuilderOutput> {
     return executeBrowserBuilder(options, context as any, {
@@ -16,5 +16,5 @@ function commandBuilder(
             target: 'web',
             node: {fs: 'empty'}
         })
-    });
+    }) as any;
 }

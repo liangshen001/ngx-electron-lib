@@ -1,5 +1,5 @@
 import {Directive, ElementRef, EventEmitter, HostListener, Input, NgZone, OnInit, Output} from '@angular/core';
-import {ElectronService} from '../electron.service';
+import {NgxElectronService} from '../ngx-electron.service';
 import {MenuItemConstructorOptions, Menu, Event} from 'electron';
 
 @Directive({
@@ -44,7 +44,7 @@ export class NgxElectronContentMenusDirective implements OnInit {
     menu: Menu;
 
     constructor(private element: ElementRef,
-                private electronService: ElectronService,
+                private electronService: NgxElectronService,
                 private ngZone: NgZone) {
     }
 

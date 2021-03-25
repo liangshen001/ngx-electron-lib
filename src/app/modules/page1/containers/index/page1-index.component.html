@@ -10,6 +10,16 @@
     </div>
     <ul>
         <li>
+            <button (click)="sendFunctionToMain()">发送回调到主进程</button>
+        </li>
+        <li>
+            <button (click)="downloadUpdate()">下载</button>
+        </li>
+        <li>
+            <button (click)="checkForUpdates()">检查更新</button>
+        </li>
+        <li>error: {{message}}</li>
+        <li>
             <h2><a rel="noopener" href="javascript:void(0);" (click)="test()">test</a></h2>
             <h2><a rel="noopener" href="javascript:void(0);" (click)="createTray()">创建Tray</a></h2>
         </li>

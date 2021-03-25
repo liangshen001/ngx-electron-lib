@@ -1,12 +1,12 @@
 import {NgModule, NgZone} from '@angular/core';
-import {NgxElectronCoreModule} from '@ngx-electron/core';
+import {NgxElectronRendererModule} from '@ngx-electron/renderer';
 import {Action, Store, StoreFeatureModule, StoreModule} from '@ngrx/store';
 
 
 @NgModule({
   declarations: [],
   imports: [
-      NgxElectronCoreModule,
+      NgxElectronRendererModule,
       StoreModule,
   ],
   exports: []

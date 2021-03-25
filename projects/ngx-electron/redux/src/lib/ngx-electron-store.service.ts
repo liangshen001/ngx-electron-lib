@@ -1,15 +1,15 @@
 import {Action, ActionsSubject, ReducerManager, StateObservable, Store} from '@ngrx/store';
 import {Injectable, NgZone} from '@angular/core';
-import {ElectronService} from '@ngx-electron/core';
+import {NgxElectronService} from '@ngx-electron/renderer';
 import {BrowserWindow, WebContents} from 'electron';
 import {take} from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
 })
-export class ElectronStore<T> extends Store<T> {
+export class NgxElectronStore<T> extends Store<T> {
 
-    constructor(private electronService: ElectronService,
+    constructor(private electronService: NgxElectronService,
                 private ngZone: NgZone,
                 state$: StateObservable,
                 actionsObserver: ActionsSubject,

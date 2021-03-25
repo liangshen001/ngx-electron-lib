@@ -52,7 +52,7 @@ export class TrayProxy implements Tray {
         this.on('right-click', () => subscriber.next());
     });
 
-    constructor(private electron: RendererInterface, private ipcRenderer: IpcRendererProxy,
+    constructor(private electron: RendererInterface, private ipcRenderer: IpcRenderer,
                 private remote: Remote, private ngZone: NgZone) {
     }
 

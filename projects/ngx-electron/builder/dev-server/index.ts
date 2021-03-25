@@ -16,5 +16,5 @@ function commandBuilder(
             target: 'web',
             node: {fs: 'empty'}
         })
-    });
+    }) as any;
 }

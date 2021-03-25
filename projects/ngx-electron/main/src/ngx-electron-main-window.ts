@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as url from 'url';
 import * as electronReload from 'electron-reload';
 import {host, isServe, openDevTools, port} from './ngx-electron-main-args';
+import {proxyWebContents} from './ngx-electron-ipc-main-proxy';
 
 const s = path.join(app.getAppPath(), 'dist', app.name);
 console.log(s);
@@ -18,6 +19,8 @@ function createWindow(options: BrowserWindowOptions): BrowserWindow {
     let win = new BrowserWindow({
         ...options
     });
+
+    proxyWebContents(win.webContents);
     console.log(`创建窗口routerUrl：${options.path}`);
     if (isServe) {
         const loadUrl = `http://${host}:${port}/#${options.path}`;
@@ -59,9 +62,6 @@ function getWinIdByKey(key: string) {
 }
 
 function initWindowListener() {
-    // 用于在渲染进程中监测主进程是否加载此文件
-    ipcMain.on('ngx-electron-load-electron-main', () => {
-    });
     // 跟据key获得win对象 同步返回 winId
     ipcMain.on('ngx-electron-renderer-get-win-id-by-key', (event, key) => event.returnValue = getWinIdByKey(key));
     // win被创建事件 保存到winMap

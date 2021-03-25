@@ -20,10 +20,14 @@
     ],
     "paths": {
       "@ngx-electron/core": [
+        "dist/ngx-electron/core/ngx-electron-core",
         "dist/ngx-electron/core"
       ],
-      "@ngx-electron/core/*": [
-        "dist/ngx-electron/core/*"
+      "@ngx-electron/renderer": [
+        "dist/ngx-electron/renderer"
+      ],
+      "@ngx-electron/renderer/*": [
+        "dist/ngx-electron/renderer/*"
       ],
       "@ngx-electron/redux": [
         "dist/ngx-electron/redux"

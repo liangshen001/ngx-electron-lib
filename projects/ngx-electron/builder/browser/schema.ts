@@ -3,6 +3,10 @@
  */
 export interface Schema {
     /**
+     * A list of CommonJS packages that are allowed to be used without a build time warning.
+     */
+    allowedCommonJsDependencies?: string[];
+    /**
      * Build using Ahead of Time compilation.
      */
     aot?: boolean;
@@ -40,16 +44,9 @@ export interface Schema {
      */
     deployUrl?: string;
     /**
-     * Enables conditionally loaded ES2015 polyfills.
-     * @deprecated This will be determined from the list of supported browsers specified in the
-     * 'browserslist' file.
+     * Concatenate modules with Rollup before bundling them with Webpack.
      */
-    es5BrowserSupport?: boolean;
-    /**
-     * Output in-file eval sourcemaps.
-     * @deprecated
-     */
-    evalSourceMap?: boolean;
+    experimentalRollupPass?: boolean;
     /**
      * Extract css from global styles into css files instead of js ones.
      */
@@ -59,7 +56,7 @@ export interface Schema {
      */
     extractLicenses?: boolean;
     /**
-     * Replace files with other files in the build.
+     * Replace compilation source files with other compilation source files in the build.
      */
     fileReplacements?: FileReplacement[];
     /**
@@ -68,20 +65,23 @@ export interface Schema {
     forkTypeChecker?: boolean;
     /**
      * Localization file to use for i18n.
+     * @deprecated Use 'locales' object in the project metadata instead.
      */
     i18nFile?: string;
     /**
      * Format of the localization file specified with --i18n-file.
+     * @deprecated No longer needed as the format will be determined automatically.
      */
     i18nFormat?: string;
     /**
      * Locale to use for i18n.
+     * @deprecated Use 'localize' instead.
      */
     i18nLocale?: string;
     /**
      * How to handle missing translations for i18n.
      */
-    i18nMissingTranslation?: string;
+    i18nMissingTranslation?: I18NMissingTranslation;
     /**
      * Configures the generation of the application's HTML index.
      */
@@ -89,8 +89,11 @@ export interface Schema {
     /**
      * List of additional NgModule files that will be lazy loaded. Lazy router modules will be
      * discovered automatically.
+     * @deprecated 'SystemJsNgModuleLoader' is deprecated, and this is part of its usage. Use
+     * 'import()' syntax instead.
      */
     lazyModules?: string[];
+    localize?: Localize;
     /**
      * The full path for the main entry point to the app, relative to the current workspace.
      */
@@ -126,14 +129,10 @@ export interface Schema {
      */
     polyfills?: string;
     /**
-     * Do not use the real path when resolving modules.
+     * Do not use the real path when resolving modules. If unset then will default to `true` if
+     * NodeJS option --preserve-symlinks is set.
      */
     preserveSymlinks?: boolean;
-    /**
-     * Output profile events for Chrome profiler.
-     * @deprecated Use "NG_BUILD_PROFILING" environment variable instead.
-     */
-    profile?: boolean;
     /**
      * Log progress to the console while building.
      */
@@ -161,11 +160,6 @@ export interface Schema {
      * Show circular dependency warnings on builds.
      */
     showCircularDependencies?: boolean;
-    /**
-     * Flag to prevent building an app shell.
-     * @deprecated
-     */
-    skipAppShell?: boolean;
     /**
      * Output sourcemaps.
      */
@@ -195,11 +189,6 @@ export interface Schema {
      * Use a separate bundle containing only vendor libraries.
      */
     vendorChunk?: boolean;
-    /**
-     * Resolve vendor packages sourcemaps.
-     * @deprecated
-     */
-    vendorSourceMap?: boolean;
     /**
      * Adds more details to output logging.
      */
@@ -297,6 +286,14 @@ export interface FileReplacement {
     with?: string;
 }
 /**
+ * How to handle missing translations for i18n.
+ */
+export declare enum I18NMissingTranslation {
+    Error = 'error',
+    Ignore = 'ignore',
+    Warning = 'warning'
+}
+/**
  * Configures the generation of the application's HTML index.
  */
 export declare type IndexUnion = IndexObject | string;
@@ -311,6 +308,7 @@ export interface IndexObject {
      */
     output?: string;
 }
+export declare type Localize = string[] | boolean;
 /**
  * Enables optimization of the build output.
  */

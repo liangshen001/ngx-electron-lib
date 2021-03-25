@@ -53,7 +53,7 @@ function replaceContent(project: string, file: string, searchValue: any = /demo/
                         console.log(err2);
                     } else {
                         console.log(`${file}文件更新完成`);
-                        resolve();
+                        resolve(null);
                     }
                 });
         });

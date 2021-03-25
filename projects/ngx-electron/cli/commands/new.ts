@@ -23,7 +23,7 @@ export function action(project, {redux, skipInstall}) {
     //     .then(() => replaceContent(project, 'electron/tsconfig.json'))
     //     .then(() => replaceContent(project, 'package.json', '"@ngx-electron/store": "lastest"',
     //         `"@ngx-electron/store": "${packageJson.version}"`))
-    //     .then(() => replaceContent(project, 'package.json', '"@ngx-electron/core": "lastest"',
+    //     .then(() => replaceContent(project, 'package.json', '"@ngx-electron/renderer": "lastest"',
     //         `"@ngx-electron/core": "${packageJson.version}"`))
     //     .then(() => replaceContent(project, 'package.json', `"@ngx-electron/main": "lastest"`,
     //         `"@ngx-electron/main": "${packageJson.version}"`))
