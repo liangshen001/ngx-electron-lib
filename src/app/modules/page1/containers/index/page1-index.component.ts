@@ -7,7 +7,7 @@ import {NgxElectronStore} from '@ngx-electron/redux';
 import {AppState} from '../../../../reducers';
 import {BrowserWindow} from 'electron';
 import {take} from 'rxjs/operators';
-import {NgxElectronBrowserWindowProxy} from '@ngx-electron/core';
+import {NgxElectronBrowserWindowProxy, NgxElectronProxy} from '@ngx-electron/core';
 
 @Component({
     selector: 'app-page1',
@@ -27,6 +27,7 @@ export class Page1IndexComponent implements OnInit {
     }
 
     constructor(private electronService: NgxElectronService,
+                private ngxElectronProxy: NgxElectronProxy<any>,
                 private state$: StateObservable,
                 private actionsObserver: ActionsSubject,
                 private reducerManager: ReducerManager,
@@ -34,52 +35,60 @@ export class Page1IndexComponent implements OnInit {
                 private store$: NgxElectronStore<AppState>) {
         // const a = new this.electronService.electron.remote.Tray('');
         // console.log(a);
-        this.state$.pipe(
-            take(1)
-        ).subscribe(state => {
-        });
-
-        // this.electronService.remote.getCurrentWindow().webContents.openDevTools();
-        this.electronService.autoUpdater.checkingForUpdate.subscribe((a) => {
-            console.log('checkingForUpdate' + JSON.stringify(a));
-        });
-        this.electronService.autoUpdater.updateAvailable.subscribe((a) => {
-            console.log('updateAvailable' + JSON.stringify(a));
-        });
-        this.electronService.autoUpdater.updateNotAvailable.subscribe((a) => {
-            console.log('updateNotAvailable' + JSON.stringify(a));
-        });
-        this.electronService.autoUpdater.error.subscribe((e) => {
-            console.log('error' + JSON.stringify(e));
-        });
-        this.electronService.autoUpdater.downloadProgress.subscribe((e) => {
-            console.log('downloadProgress' + JSON.stringify(e));
-        });
-        this.electronService.autoUpdater.updateDownloaded.subscribe((e) => {
-            console.log('updateDownloateDownloaded' + JSON.stringify(e));
-        });
-        this.electronService.ipcRenderer.on('message', (event, text) => {
-            console.log(text);
-        });
-        // 注意：“downloadProgress”事件可能存在无法触发的问题，只需要限制一下下载网速就好了
-        this.electronService.ipcRenderer.on('downloadProgress', (event, progressObj)=> {
-            console.log(progressObj);
-        });
-        this.electronService.ipcRenderer.on('isUpdateNow', () => {
-            this.electronService.ipcRenderer.send('isUpdateNow');
-        });
+        // this.state$.pipe(
+        //     take(1)
+        // ).subscribe(state => {
+        // });
+        //
+        // // this.electronService.remote.getCurrentWindow().webContents.openDevTools();
+        // this.electronService.autoUpdater.checkingForUpdate.subscribe((a) => {
+        //     console.log('checkingForUpdate' + JSON.stringify(a));
+        // });
+        // this.electronService.autoUpdater.updateAvailable.subscribe((a) => {
+        //     console.log('updateAvailable' + JSON.stringify(a));
+        // });
+        // this.electronService.autoUpdater.updateNotAvailable.subscribe((a) => {
+        //     console.log('updateNotAvailable' + JSON.stringify(a));
+        // });
+        // this.electronService.autoUpdater.error.subscribe((e) => {
+        //     console.log('error' + JSON.stringify(e));
+        // });
+        // this.electronService.autoUpdater.downloadProgress.subscribe((e) => {
+        //     console.log('downloadProgress' + JSON.stringify(e));
+        // });
+        // this.electronService.autoUpdater.updateDownloaded.subscribe((e) => {
+        //     console.log('updateDownloateDownloaded' + JSON.stringify(e));
+        // });
+        // this.electronService.ipcRenderer.on('isUpdateNow', () => {
+        //     this.electronService.ipcRenderer.send('isUpdateNow');
+        // });
 
         // this.electronService.tray.on('double-click', () => this.electronService.remote.getCurrentWindow().focus());
         // const tray = new this.electronService.electron.remote.Tray('');
     }
 
     test() {
-        const a: any = {};
-        a.test = () => {
-            this.title = 'test-test';
-            console.log(this.title);
-        };
-        this.electronService.ipcRenderer.send('test-test', a);
+        // const win = new this.ngxElectronProxy.BrowserWindow({
+        //     ngxPath: 'page3',
+        //     width: 1024,
+        //     height: 768,
+        //     title: 'ngx-electron-lib2',
+        //     webPreferences: {
+        //         nodeIntegration: true
+        //     },
+        // });
+        // win.webContents.openDevTools();
+        // win.onBlur.subscribe(data => {
+        //     console.log(11111111111);
+        // })
+        //
+        //
+        this.ngxElectronProxy.ipcRenderer.send('sendFunctionToMain', 123);
+        // this.ngxElectronProxy.remote.Menu.setApplicationMenu(this.ngxElectronProxy.remote.Menu.buildFromTemplate([{
+        //     label: 'test',
+        //     role: 'about',
+        //     type: 'radio'
+        // }]))
     }
 
     createTray() {
@@ -140,15 +149,15 @@ export class Page1IndexComponent implements OnInit {
     openPage3() {
         if (this.electronService.isElectron) {
             this.page3Win = this.electronService.createWindow({
-                path: 'page3',
-                key: 'page3',
+                ngxPath: 'page3',
+                // key: 'page3',
                 width: 1024,
                 height: 768,
                 title: 'ngx-electron-lib2',
                 webPreferences: {
                     nodeIntegration: true
                 },
-                callback: event => this.store$.synchronized(event.sender)
+                // callback: event => this.store$.synchronized(event.sender)
             });
         } else {
             this.router.navigateByUrl('page3');
@@ -174,20 +183,20 @@ export class Page1IndexComponent implements OnInit {
     sendFunctionToMain() {
         // this.electronService.electron.ipcRenderer.send('sendFunctionToMain', (a) => {a((b) => {console.log(b)}, (c) => {console.log(c)})})
         // this.electronService.electron.ipcRenderer.send('sendFunctionToMain', (a) => {a()})
-        const win = new NgxElectronBrowserWindowProxy({
-            width: 1024,
-            height: 768,
-            show: true,
-            autoHideMenuBar: true,
-            title: 'ngx-electron-lib',
-            webPreferences: {
-                nodeIntegration: true,
-                webSecurity: false
-            }
-        });
-        win.webContents.openDevTools();
-        win.onClose.subscribe(a => {
-            alert(1);
-        })
+        // const win = new NgxElectronBrowserWindowProxy({
+        //     width: 1024,
+        //     height: 768,
+        //     show: true,
+        //     autoHideMenuBar: true,
+        //     title: 'ngx-electron-lib',
+        //     webPreferences: {
+        //         nodeIntegration: true,
+        //         webSecurity: false
+        //     }
+        // });
+        // win.webContents.openDevTools();
+        // win.onceClose.subscribe(a => {
+        //     alert(1);
+        // })
     }
 }

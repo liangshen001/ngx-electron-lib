@@ -15,8 +15,8 @@ export class Page2IndexComponent implements OnInit {
     constructor(private electronService: NgxElectronService) {}
 
     ngOnInit(): void {
-        this.data$ = this.electronService.data<string>().pipe(
+        this.data$ = null/*this.electronService.data<string>().pipe(
             map(({data}) => data)
-        );
+        );*/
     }
 }

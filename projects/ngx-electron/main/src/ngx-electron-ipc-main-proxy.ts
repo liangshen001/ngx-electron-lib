@@ -2,10 +2,9 @@ import {IpcMain, ipcMain, IpcRenderer, WebContents} from 'electron';
 import {NgZone} from '@angular/core';
 
 const proxy_set = new WeakSet();
-global.Proxy = new Proxy(Proxy, {
+Proxy = new Proxy(Proxy, {
     construct(target, args: any) {
-        // @ts-ignore
-        const proxy = new target(...args);
+        const proxy = Reflect.construct(target, args);
         proxy_set.add(proxy);
         return proxy;
     }

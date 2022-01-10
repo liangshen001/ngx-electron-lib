@@ -1,37 +1,52 @@
-import {
-    AllElectron,
-    IpcMain,
-    IpcMainEvent,
-    IpcRenderer,
-    IpcRendererEvent,
-    MainInterface,
-    RendererInterface,
-    WebContents
-} from 'electron';
+/*
+import {IpcMain, IpcMainEvent, IpcRenderer, IpcRendererEvent, WebContents} from 'electron';
 import {NgZone} from '@angular/core';
-import {isRenderer, proxySet} from '../utils/utils';
+import {isRenderer, proxySet} from '../../utils/utils';
+import {ChannelsMap} from './ngx-electron-ipc-proxy';
+import { NgxElectronIpcMainProxy } from './ngx-electron-ipc-main-proxy';
+import { NgxElectronIpcRendererProxy } from './ngx-electron-ipc-renderer-proxy';
 
-export class IpcProxy {
-    /**
+export class NgxElectronIpcProxyUtil {
+
+    /!**
      * 用于存放进程中的channel 对应的 回调
-     */
+     *!/
     private static callbackMap = new Map<number, Function>();
 
-    /**
+    /!**
      * 用于存放进程中的回调 对应的 channel  用于解决回调参数中 多处使用同一个函数对象的情况
-     */
+     *!/
     private static callbackMap2 = new Map<Function, number>();
 
-    /**
+    /!**
      * 主要解决ipc传参数不能传加调函数问题
      * @param ipc
-     * @param ngZone
-     */
-    public static proxy(ipc: IpcMain | IpcRenderer, ngZone?: NgZone) {
+     * @param ngZone?
+     *!/
+    public static proxy<T extends ChannelsMap>(ipc: IpcRenderer | IpcMain, ngZone?: NgZone): NgxElectronIpcMainProxy<T>;
+    public static proxy<T extends ChannelsMap>(ipc: IpcRenderer, ngZone?: NgZone): NgxElectronIpcRendererProxy<T>;
+    public static proxy<T extends ChannelsMap>(ipc: IpcMain | IpcRenderer, ngZone?: NgZone):
+        NgxElectronIpcMainProxy<T> | NgxElectronIpcRendererProxy<T> {
+
+        const ipcProxy = new Proxy(ipc, {
+            get(target: Electron.IpcMain | Electron.IpcRenderer, p: PropertyKey, receiver: any): any {
+                const cache = Reflect.get(target, p, receiver);
+                if (cache) {
+                    return cache;
+                }
+                const value = target[p];
+                Reflect.set(target, p, value, receiver)
+                return value;
+            },
+            set(target: Electron.IpcMain | Electron.IpcRenderer, p: PropertyKey, value: any, receiver: any): boolean {
+                return Reflect.set(target, p, value, receiver);
+            }
+        });
+
         // 对ipc的on方法进行代理
-        const ipcOn = ipc.on;
-        ipc.on = (channel, listener) => {
-            return ipcOn.call(ipc, channel, (event: IpcMainEvent | IpcRendererEvent, ...args) => {
+        const ipcOn = ipcProxy.on;
+        ipcProxy.on = (channel, listener) => {
+            return ipcOn.call(ipcProxy, channel, (event: IpcMainEvent | IpcRendererEvent, ...args) => {
                 console.log(`${isRenderer ? 'IpcRenderer' : 'IpcMain'}.on(${channel}, ${args.map(i => JSON.stringify(i)).join(',')})`);
                 args = this.analysisCallback(event.sender, args);
                 listener(event, ...args);
@@ -39,36 +54,50 @@ export class IpcProxy {
         }
         // 监听 对方进程 执行回调的channel
         const applyCallbackChannel = `ngx-electron-apply-${isRenderer ? 'main' : 'renderer'}-callback`;
-        ipc.on(applyCallbackChannel, (event, callbackId, ...args) => {
+        ipcProxy.on(applyCallbackChannel, (event, callbackId, ...args) => {
             this.callbackMap.get(callbackId)(...args);
             // event.returnValue = null;
         });
         // 渲染进程中需要 对ipcRenderer的发送方法进行代理
         if (isRenderer) {
-            this.proxyIpcSender(ipc as IpcRenderer, ngZone);
+            const ipcRenderer = ipcProxy as IpcRenderer;
+            // this.proxyIpcSender(ipcRenderer, ngZone);
+            return new NgxElectronIpcRendererProxy(ipcRenderer, ngZone);
+        } else {
+            const ipcMain = ipcProxy as IpcMain;
+            // ngxElectronIpcMainProxy = new Proxy(ipc as IpcMain, {
+            //     get(target: Electron.IpcMain, p: PropertyKey, receiver: any): any {
+            //         return Reflect.get(target, p, receiver);
+            //     }
+            // }) as NgxElectronIpcMainProxy<T>;
+
+            return new NgxElectronIpcMainProxy(ipcMain);
         }
     }
 
-    /**·
+    /!**·
      * 代理sender 代理方法有send|sendSync|sendTo|sendToHost
      * @private
-     */
+     *!/
     public static proxyIpcSender(sender: IpcRenderer | WebContents, ngZone?: NgZone) {
         ['send', 'sendSync', 'sendTo', 'sendToHost'].forEach(methodName => this.proxyIpcSenderMethod(sender, methodName, ngZone))
     }
 
 
-    /**
+    /!**
      * 代理sender的指定方法   参数注册回调
      * @private
-     */
+     *!/
     private static proxyIpcSenderMethod(sender: IpcRenderer | WebContents,
                                         methodName: string, ngZone?: NgZone) {
         const senderMethodTemp = sender[methodName];
         sender[methodName] = (...args: any[]) => {
             args = this.registryCallback(sender, args, [], ngZone);
             console.log(`${isRenderer ? 'IpcRenderer' : 'WebContents'}.${methodName}(${args.map(i => JSON.stringify(i)).join(', ')})`);
-            senderMethodTemp.apply(sender, args);
+            const returnValue = senderMethodTemp.apply(sender, args);
+            if (returnValue !== undefined) {
+                return this.analysisCallback(sender, returnValue);
+            }
         }
     }
 
@@ -135,3 +164,4 @@ export class IpcProxy {
         return obj;
     }
 }
+*/

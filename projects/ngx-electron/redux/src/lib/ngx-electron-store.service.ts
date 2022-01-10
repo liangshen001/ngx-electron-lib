@@ -15,29 +15,29 @@ export class NgxElectronStore<T> extends Store<T> {
                 actionsObserver: ActionsSubject,
                 reducerManager: ReducerManager) {
         super(state$, actionsObserver, reducerManager);
-        if (this.electronService.isElectron) {
-            const windowsId = this.electronService.electron.remote.getCurrentWindow().id;
-            // dispatch action
-            this.electronService.ipcRenderer.on(`ngx-electron-action-shared-${windowsId}`,
-                (event, action) => this.ngZone.run(() => super.dispatch(action)));
-
-            const reduxSynchronizedType = '@ngx-electron/redux init state';
-            this.electronService.ipcRenderer.once(`ngx-electron-synchronized-state`,
-                (event, state) => this.ngZone.run(() => {
-                    const reducers = (reducerManager as any).reducers;
-                    Object.keys(reducers).forEach(key => {
-                        const reducer = reducers[key];
-                        reducers[key] = (s, action) => {
-                            if (action.type === reduxSynchronizedType) {
-                                return action.state;
-                            }
-                            return reducer.call(this, s, action);
-                        };
-                        this.addReducer(key, reducers[key]);
-                        setTimeout(() => this.dispatch({type: reduxSynchronizedType, state: state[key]}));
-                    });
-                }));
-        }
+        // if (this.electronService.isElectron) {
+        //     const windowsId = this.electronService.electron.remote.getCurrentWindow().id;
+        //     // dispatch action
+        //     this.electronService.ipcRenderer.on(`ngx-electron-action-shared-${windowsId}`,
+        //         (event, action) => this.ngZone.run(() => super.dispatch(action)));
+        //
+        //     const reduxSynchronizedType = '@ngx-electron/redux init state';
+        //     this.electronService.ipcRenderer.once(`ngx-electron-synchronized-state`,
+        //         (event, state) => this.ngZone.run(() => {
+        //             const reducers = (reducerManager as any).reducers;
+        //             Object.keys(reducers).forEach(key => {
+        //                 const reducer = reducers[key];
+        //                 reducers[key] = (s, action) => {
+        //                     if (action.type === reduxSynchronizedType) {
+        //                         return action.state;
+        //                     }
+        //                     return reducer.call(this, s, action);
+        //                 };
+        //                 this.addReducer(key, reducers[key]);
+        //                 setTimeout(() => this.dispatch({type: reduxSynchronizedType, state: state[key]}));
+        //             });
+        //         }));
+        // }
     }
 
     synchronized(targetWebContents: WebContents) {
@@ -70,8 +70,8 @@ export class NgxElectronStore<T> extends Store<T> {
      */
     dispatchToWindowsByKeys<V extends Action = Action>(action: V, ...keys: string[]): void {
         if (this.electronService.isElectron) {
-            const winIds = keys.map(key => this.electronService.getWinIdByKey(key));
-            this.dispatchToWindowsByIds(action, ...winIds);
+            // const winIds = keys.map(key => this.electronService.getWinIdByKey(key));
+            // this.dispatchToWindowsByIds(action, ...winIds);
         }
     }
 

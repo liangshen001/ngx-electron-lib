@@ -1,19 +1,14 @@
 import {
-    app,
     BrowserWindow,
     BrowserWindowConstructorOptions,
-    CommonInterface,
     IpcMainEvent,
     IpcRendererEvent
 } from 'electron';
-import * as electron from 'electron';
-import {IpcProxy} from './ipc-proxy';
-import {NgZone} from '@angular/core';
-import * as path from 'path';
-import * as url from 'url';
-import {commonInterface, isRenderer} from '../utils/utils';
 import {Observable} from 'rxjs';
-import {host, isServe, openDevTools, port} from '../utils/electron-main-args-utils';
+import * as electron from 'electron';
+
+export type NgxElectronBrowserWindowProxyConstructor =
+    (new (options?: NgxElectronBrowserWindowProxyConstructorOptions) => NgxElectronBrowserWindowProxy) & typeof BrowserWindow;
 
 
 export interface NgxElectronBrowserWindowProxyConstructorOptions extends BrowserWindowConstructorOptions {
@@ -22,9 +17,6 @@ export interface NgxElectronBrowserWindowProxyConstructorOptions extends Browser
 }
 
 export interface NgxElectronBrowserWindowProxy extends BrowserWindow {
-
-    new(options?: NgxElectronBrowserWindowProxyConstructorOptions): NgxElectronBrowserWindowProxy;
-
     /**
      * Emitted when the window is set or unset to show always on top of other windows.
      */
@@ -294,130 +286,4 @@ export interface NgxElectronBrowserWindowProxy extends BrowserWindow {
         newBounds: electron.Rectangle
     }>;
 }
-export let NgxElectronBrowserWindowProxy;
-
-export class NgxElectronBrowserWindowProxyUtil {
-
-
-    /**
-     * 代理BrowserWindow
-     */
-    public static proxy(ngZone?: NgZone) {
-
-        if (!isRenderer) {
-            electron.ipcMain.on('ngx-electron-renderer-win-created', () => {
-
-            });
-            electron.ipcMain.on('ngx-electron-renderer-win-destroyed', () => {
-
-            });
-        }
-        debugger;
-        NgxElectronBrowserWindowProxy = new Proxy(commonInterface.BrowserWindow, {
-            construct(target: any, argArray: [NgxElectronBrowserWindowProxyConstructorOptions]) : NgxElectronBrowserWindowProxy {
-                let options = argArray[0] || {};
-                const win = new target(options);
-
-                const events = ['always-on-top-changed', 'app-command', 'blur', 'close', 'closed', 'enter-full-screen', 'enter-html-full-screen', 'focus', 'hide', 'leave-full-screen', 'leave-html-full-screen', 'maximize',
-                    'minimize', 'move', 'moved', 'new-window-for-tab', 'page-title-updated', 'ready-to-show', 'resize', 'responsive', 'restore', 'rotate-gesture', 'scroll-touch-begin', 'scroll-touch-edge', 'scroll-touch-end',
-                    'session-end', 'sheet-begin', 'sheet-end', 'swipe', 'unmaximize', 'unresponsive', 'will-move', 'will-resize'];
-                NgxElectronBrowserWindowProxyUtil.definedObservables(win, events, 'event', 'isAlwaysOnTop', 'command', 'rotation', 'direction', 'newBounds');
-
-                if (!isRenderer) {
-                    // 给主进程中webContents添加发送回调函数的功能
-                    IpcProxy.proxyIpcSender(win.webContents, ngZone);
-                }
-                // 加载指定路由
-                const ngxPath = options.ngxPath || '';
-                console.log(`create windows use routerUrl：${ngxPath}`);
-                if (isServe) {
-                    const loadUrl = `http://${host}:${port}/#${ngxPath}`;
-                    console.log(`load url：${loadUrl}`);
-                    win.loadURL(loadUrl);
-                } else {
-                    const pathname = path.join(app.getAppPath(), `/dist/${app.name}/index.html`);
-                    console.log(`create locale file pathname:${pathname}#${ngxPath}`);
-                    win.loadURL(url.format({
-                        pathname,
-                        protocol: 'file:',
-                        slashes: true
-                    }) + `#${ngxPath}`);
-                    win.webContents.reloadIgnoringCache();
-                }
-                // if (options.key) {
-                //     if (isRenderer) {
-                //         electron.ipcRenderer.send('ngx-electron-renderer-win-created', options.key, win.id);
-                //     } else {
-                //         winIdMap.set(options.key, win.id);
-                //     }
-                // }
-                if (isServe || openDevTools) {
-                    console.log(`openDevTools：${isServe || openDevTools}`);
-                    win.webContents.openDevTools();
-                }
-                if (isRenderer) {
-                    electron.remote.ipcMain.on(`ngx-electron-renderer-win-initialized-${win.id}`, event => {
-                        console.log(electron.remote.getCurrentWindow().id);
-                        event.returnValue = electron.remote.getCurrentWindow().id;
-                        debugger;
-                        if (options && options.ngxInitCallback) {
-                            options.ngxInitCallback(event);
-                        }
-                    });
-                } else {
-                }
-                win.on('focus', () => {
-                    if (isRenderer) {
-                        electron.ipcRenderer.sendSync('ngx-electron-renderer-focus-window-id', win.id);
-                    } else {
-                        this.currentWindowId = win.id;
-                    }
-                });
-                return win;
-            },
-        });
-    }
-
-    private static definedObservables(target: BrowserWindow, events: string[], ...argNames: string[]) {
-        events.forEach(event => {
-            const name = `-${event}`.replace(/-(\w)/g, (all, letter) => letter.toUpperCase());
-            [target[`on${name}`], target[`once${name}`]] = this.newObservables(target, event, ...argNames);
-        })
-    }
-
-
-
-    /**
-     * 创建可响应对象
-     */
-    private static newObservable<T, P extends keyof T>(target: BrowserWindow, type: 'on' | 'once', event: string | any, ...argNames: P[]) {
-        const isOn = type === 'on';
-        return new Observable<T>(subscriber => {
-            const callback = (...args: any[]) => {
-                subscriber.next(argNames.reduce((p, v, i) => ({
-                    ...p,
-                    [v]: args[i]
-                }), {} as T));
-                if (isOn) {
-                    subscriber.complete();
-                }
-            };
-            target[type](event, callback);
-            if (isOn) {
-                return () => target.removeListener(event, callback);
-            }
-        });
-    }
-
-    /**
-     * 创建一对 可响应对象 第一个不关闭的流  第二个只发射一次关闭的流
-     */
-    private static newObservables<T, P extends keyof T>(target: BrowserWindow, event: string | any, ...argNames: any[]) {
-        return [
-            this.newObservable<T, P>(target, 'on', event, ...argNames),
-            this.newObservable<T, P>(target, 'once', event, ...argNames)
-        ];
-    }
-}
-
 
